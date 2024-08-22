@@ -1,7 +1,6 @@
 import express from "express";
 import mongoose from "./db.js"; // Ensure this is correctly connecting to MongoDB
 
-import userRoutes from "./routes/users.js";
 import teamRoutes from "./routes/teams.js";
 import playersRoutes from "./routes/players.js";
 import nhlRoutes from "./routes/nhlstats.js";
@@ -12,7 +11,6 @@ const app = express();
 app.use(express.json());
 
 // Route prefixes
-app.use("/api", userRoutes);
 app.use("/api", teamRoutes);
 app.use("/api", playersRoutes);
 app.use("/nhl", nhlRoutes);
