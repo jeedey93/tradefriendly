@@ -1,70 +1,80 @@
-# Getting Started with Create React App
+TradeFriendly
+Welcome to TradeFriendly! This application allows you to discover the best NHL teams and players, manage your roster, analyze player stats, and make informed trade decisions.
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Features
+Team and Player Information: Fetch and display detailed information about NHL teams and players.
+Roster Management: Manage your team’s roster, including adding and removing players.
+Player Stats Analysis: Analyze player statistics to make informed trade decisions.
+Trade Simulator: Simulate trades between teams to evaluate potential trade outcomes.
+Draft Tracking: Track and manage draft picks and player performance.
+Tech Stack
+Frontend: ReactJS
+Backend: ExpressJS
+Database: MongoDB
+API: NHL API for real-time player and team data
+Installation
+Prerequisites
+Node.js (v16 or later)
+MongoDB (running locally or using a cloud instance)
+Clone the Repository
+bash
+Copy code
+git clone https://github.com/your-username/TradeFriendly.git
+cd TradeFriendly
+Install Dependencies
+Navigate to both the client and server directories to install the required dependencies.
 
-## Available Scripts
+For the server:
 
-In the project directory, you can run:
+bash
+Copy code
+cd server
+npm install
+For the client:
 
-### `npm start`
+bash
+Copy code
+cd ../client
+npm install
+Environment Variables
+Create a .env file in the server directory and add the following variables:
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+env
+Copy code
+MONGODB_URI=your-mongodb-uri
+PORT=5000
+Running the Application
+Start the Backend Server:
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+bash
+Copy code
+cd server
+npm start
+Start the React Frontend:
 
-### `npm test`
+bash
+Copy code
+cd ../client
+npm start
+The application will be available at http://localhost:3000 and the API server at http://localhost:5000.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+API Endpoints
+GET /api/teams: Retrieve a list of NHL teams.
+GET /api/players: Retrieve a list of players.
+GET /nhl/stats: Retrieve current player stats from the NHL API.
+POST /api/players: Add or update player information in the database.
+Contributing
+Fork the repository.
+Create a new branch (git checkout -b feature/YourFeature).
+Make your changes.
+Commit your changes (git commit -am 'Add new feature').
+Push to the branch (git push origin feature/YourFeature).
+Create a new Pull Request.
+License
+This project is licensed under the MIT License - see the LICENSE file for details.
 
-### `npm run build`
+Contact
+For any questions or feedback, please contact:
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Your Name: justin.do@hotmail.com
+GitHub: https://github.com/jeedey93
