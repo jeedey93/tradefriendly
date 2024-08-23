@@ -15,6 +15,7 @@ import {
   Snackbar,
   Alert,
   Container,
+  Pagination,
 } from "@mui/material";
 
 function Players() {
@@ -23,9 +24,25 @@ function Players() {
   const [loading, setLoading] = useState(true);
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 50;
 
-  useEffect(() => {
-    // Fetch roster data
+  const fetchDatabasePlayers = () => {
+    setLoading(true);
+    fetch(`/api/players`)
+      .then((response) => response.json())
+      .then((data) => {
+        setPlayers(data);
+        setLoading(false);
+      })
+      .catch((error) => {
+        setError("Error fetching players data: " + error.message);
+        setLoading(false);
+      });
+  };
+
+  const fetchApiPlayers = () => {
+    setLoading(true);
     fetch(`/nhl/stats`)
       .then((response) => response.json())
       .then((data) => {
@@ -36,6 +53,10 @@ function Players() {
         setError("Error fetching players data: " + error.message);
         setLoading(false);
       });
+  };
+
+  useEffect(() => {
+    fetchDatabasePlayers();
   }, []);
 
   const handleChange = (id, field, value) => {
@@ -65,7 +86,7 @@ function Players() {
       },
       body: JSON.stringify(updatedPlayers),
     })
-      .then((data) => {
+      .then(() => {
         setSnackbarMessage("Players saved successfully!");
         setOpenSnackbar(true); // Show success message
       })
@@ -76,6 +97,14 @@ function Players() {
 
   const handleCloseSnackbar = () => {
     setOpenSnackbar(false);
+  };
+
+  const handleRefresh = () => {
+    fetchApiPlayers();
+  };
+
+  const handlePageChange = (event, value) => {
+    setCurrentPage(value);
   };
 
   if (loading)
@@ -97,16 +126,32 @@ function Players() {
       </Typography>
     );
 
+  // Calculate the data to display based on pagination
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedPlayers = players.slice(startIndex, startIndex + itemsPerPage);
+  const totalPages = Math.ceil(players.length / itemsPerPage);
+
   return (
     <Box display="flex" flexDirection="column" minHeight="100vh">
       <Container component="main" sx={{ flex: 1, py: 4 }}>
-        <Typography variant="h4" gutterBottom>
-          Player List
-        </Typography>
+        <Box
+          display="flex"
+          justifyContent="space-between"
+          alignItems="center"
+          mb={2}
+        >
+          <Typography variant="h4" gutterBottom>
+            Player List
+          </Typography>
+          <Button variant="contained" color="secondary" onClick={handleRefresh}>
+            Refresh
+          </Button>
+        </Box>
         <TableContainer component={Paper} elevation={3}>
           <Table>
             <TableHead>
               <TableRow>
+                <TableCell>#</TableCell>
                 <TableCell>Name</TableCell>
                 <TableCell align="right">Points</TableCell>
                 <TableCell align="right">Overall Score</TableCell>
@@ -115,15 +160,16 @@ function Players() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {players.map((player) => (
+              {paginatedPlayers.map((player, index) => (
                 <TableRow key={player.id} hover>
+                  <TableCell>{startIndex + index + 1}</TableCell>
                   <TableCell>{player.name}</TableCell>
                   <TableCell align="right">{player.points}</TableCell>
                   <TableCell align="right">{player.overallScore}</TableCell>
                   <TableCell align="right">
                     <TextField
                       type="number"
-                      value={player.capHit || ""}
+                      value={player.capHit || "0"}
                       onChange={(e) =>
                         handleChange(player.id, "capHit", e.target.value)
                       }
@@ -149,6 +195,14 @@ function Players() {
             </TableBody>
           </Table>
         </TableContainer>
+        <Box display="flex" justifyContent="center" mt={2}>
+          <Pagination
+            count={totalPages}
+            page={currentPage}
+            onChange={handlePageChange}
+            color="primary"
+          />
+        </Box>
       </Container>
       <Box
         component="footer"
