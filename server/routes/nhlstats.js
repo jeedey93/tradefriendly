@@ -8,7 +8,7 @@ const router = express.Router();
 
 router.get("/stats", async (req, res) => {
   try {
-    const url = `https://api-web.nhle.com/v1/skater-stats-leaders/current?categories=points&limit=20`;
+    const url = `https://api-web.nhle.com/v1/skater-stats-leaders/current?categories=points&limit=810`;
 
     // Make a GET request to the NHL API
     const response = await fetch(url);
@@ -186,9 +186,9 @@ function extractPlayerLeadersData(nhlData, playersData) {
       points: player.value,
       position: player.position,
       teamAbbrev: player.teamAbbrev,
-      capHit: dbPlayer ? dbPlayer.capHit : "N/A",
-      yearsLeft: dbPlayer ? dbPlayer.yearsLeft : "N/A",
-      overallScore: dbPlayer ? dbPlayer.overallScore : "N/A",
+      capHit: dbPlayer ? dbPlayer.capHit : 0,
+      yearsLeft: dbPlayer ? dbPlayer.yearsLeft : 0,
+      overallScore: dbPlayer ? dbPlayer.overallScore : 0,
     };
   });
 }
