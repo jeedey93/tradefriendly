@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Container,
   Table,
@@ -17,20 +17,28 @@ import {
   Box,
   Typography,
   Paper,
-  Grid,
-  Divider,
-  Stack,
+  Popover,
+  Snackbar,
 } from "@mui/material";
+
 import { Delete, Add } from "@mui/icons-material";
 
 const AdminRumor = () => {
-  const [rumors, setRumors] = useState([
-    {
-      playerName: "",
-      tradeReason: "",
-      rumoredTeams: [{ team: "", chance: 0, links: [{ title: "", url: "" }] }],
-    },
-  ]);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+
+  const [rumors, setRumors] = useState([]);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [newRumor, setNewRumor] = useState({
+    playerName: "",
+    playerImage: "",
+    tradeReason: "",
+    rumoredTeams: [
+      { teamId: "", teamName: "", chance: 0, links: [{ title: "", url: "" }] },
+    ],
+  });
 
   const teamTradeReasons = [
     "Salary Cap Management",
@@ -46,316 +54,344 @@ const AdminRumor = () => {
     "Desire for a New Challenge",
     "Personal Reasons",
     "Team Rebuilding",
-    "Player Conflict",
   ];
 
-  const teams = ["Team A", "Team B", "Team C"];
+  const tradeReasons = teamTradeReasons.concat(playerTradeReasons);
 
-  const handleAddRumor = () => {
-    setRumors([
-      ...rumors,
-      {
-        playerName: "",
-        tradeReason: "",
-        rumoredTeams: [
-          { team: "", chance: 0, links: [{ title: "", url: "" }] },
-        ],
+  const [teamsData, setTeamsData] = useState([]);
+
+  useEffect(() => {
+    fetch("/api/teams")
+      .then((response) => response.json())
+      .then((data) => {
+        data.sort((a, b) => a.city.localeCompare(b.city));
+        setTeamsData(data);
+      })
+      .catch((error) => console.error("Error fetching teams data:", error));
+  }, []);
+
+  const handleAddRumorClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handlePopoverClose = () => {
+    setAnchorEl(null);
+    resetNewRumor();
+  };
+
+  const handleSaveRumor = () => {
+    setRumors([...rumors, newRumor]);
+
+    fetch("/api/rumors", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
       },
-    ]);
+      body: JSON.stringify(newRumor),
+    })
+      .then(() => {
+        setSnackbarMessage("Rumor saved successfully!");
+        setOpenSnackbar(true);
+      })
+      .catch((error) => {
+        setError("Error saving rumor data: " + error.message);
+      });
+
+    handlePopoverClose();
+  };
+
+  const resetNewRumor = () => {
+    setNewRumor({
+      playerName: "",
+      playerImage: "",
+      tradeReason: "",
+      rumoredTeams: [
+        {
+          teamId: "",
+          teamName: "",
+          chance: 0,
+          links: [{ title: "", url: "" }],
+        },
+      ],
+    });
+  };
+
+  const handleRumorChange = (field, value) => {
+    setNewRumor((prevRumor) => ({ ...prevRumor, [field]: value }));
+  };
+
+  const handleRumoredTeamChange = (index, field, value) => {
+    const updatedTeams = [...newRumor.rumoredTeams];
+
+    if (field === "teamId") {
+      const selectedTeam = teamsData.find((team) => team._id === value);
+      if (selectedTeam) {
+        updatedTeams[index] = {
+          ...updatedTeams[index],
+          teamId: value,
+          teamName: `${selectedTeam.city} ${selectedTeam.name}`,
+        };
+      }
+    } else {
+      updatedTeams[index] = { ...updatedTeams[index], [field]: value };
+    }
+
+    setNewRumor((prevRumor) => ({ ...prevRumor, rumoredTeams: updatedTeams }));
+  };
+
+  const handleAddRumoredTeam = () => {
+    setNewRumor((prevRumor) => ({
+      ...prevRumor,
+      rumoredTeams: [
+        ...prevRumor.rumoredTeams,
+        {
+          teamId: "",
+          teamName: "",
+          chance: 0,
+          links: [{ title: "", url: "" }],
+        },
+      ],
+    }));
   };
 
   const handleRemoveRumor = (index) => {
-    const updatedRumors = rumors.filter((_, i) => i !== index);
-    setRumors(updatedRumors);
+    setRumors(rumors.filter((_, i) => i !== index));
   };
 
-  const handleRumorChange = (index, field, value) => {
-    const updatedRumors = [...rumors];
-    updatedRumors[index][field] = value;
-    setRumors(updatedRumors);
+  const handleAddLink = (teamIndex) => {
+    const updatedTeams = [...newRumor.rumoredTeams];
+    updatedTeams[teamIndex].links.push({ title: "", url: "" });
+    setNewRumor((prevRumor) => ({ ...prevRumor, rumoredTeams: updatedTeams }));
   };
 
-  const handleRumoredTeamChange = (rumorIndex, teamIndex, field, value) => {
-    const updatedRumors = [...rumors];
-    updatedRumors[rumorIndex].rumoredTeams[teamIndex][field] = value;
-    setRumors(updatedRumors);
+  const handleLinkChange = (teamIndex, linkIndex, field, value) => {
+    const updatedTeams = [...newRumor.rumoredTeams];
+    updatedTeams[teamIndex].links[linkIndex] = {
+      ...updatedTeams[teamIndex].links[linkIndex],
+      [field]: value,
+    };
+    setNewRumor((prevRumor) => ({ ...prevRumor, rumoredTeams: updatedTeams }));
   };
 
-  const handleLinkChange = (rumorIndex, teamIndex, linkIndex, field, value) => {
-    const updatedRumors = [...rumors];
-    updatedRumors[rumorIndex].rumoredTeams[teamIndex].links[linkIndex][field] =
-      value;
-    setRumors(updatedRumors);
-  };
-
-  const handleAddTeam = (index) => {
-    const updatedRumors = [...rumors];
-    updatedRumors[index].rumoredTeams.push({
-      team: "",
-      chance: 0,
-      links: [{ title: "", url: "" }],
-    });
-    setRumors(updatedRumors);
-  };
-
-  const handleRemoveTeam = (rumorIndex, teamIndex) => {
-    const updatedRumors = [...rumors];
-    updatedRumors[rumorIndex].rumoredTeams = updatedRumors[
-      rumorIndex
-    ].rumoredTeams.filter((_, i) => i !== teamIndex);
-    setRumors(updatedRumors);
-  };
-
-  const handleAddLink = (rumorIndex, teamIndex) => {
-    const updatedRumors = [...rumors];
-    updatedRumors[rumorIndex].rumoredTeams[teamIndex].links.push({
-      title: "",
-      url: "",
-    });
-    setRumors(updatedRumors);
-  };
-
-  const handleRemoveLink = (rumorIndex, teamIndex, linkIndex) => {
-    const updatedRumors = [...rumors];
-    updatedRumors[rumorIndex].rumoredTeams[teamIndex].links = updatedRumors[
-      rumorIndex
-    ].rumoredTeams[teamIndex].links.filter((_, i) => i !== linkIndex);
-    setRumors(updatedRumors);
-  };
+  const open = Boolean(anchorEl);
+  const id = open ? "add-rumor-popover" : undefined;
 
   return (
-    <Container maxWidth="xl">
-      <Typography
-        variant="h3"
-        gutterBottom
-        align="center"
-        sx={{ fontWeight: "bold", color: "primary.main" }}
-      >
-        Admin Rumor Management
+    <Container maxWidth="lg">
+      <Typography variant="h4" align="center" gutterBottom>
+        Admin Rumor Page
       </Typography>
-      <Box my={4} textAlign="center">
+      <Box my={4}>
         <Button
           variant="contained"
           color="primary"
           startIcon={<Add />}
-          onClick={handleAddRumor}
+          onClick={handleAddRumorClick}
         >
           Add Rumor
         </Button>
+        <Popover
+          id={id}
+          open={open}
+          anchorEl={anchorEl}
+          onClose={handlePopoverClose}
+          anchorOrigin={{
+            vertical: "bottom",
+            horizontal: "center",
+          }}
+          transformOrigin={{
+            vertical: "top",
+            horizontal: "center",
+          }}
+        >
+          <Box p={2} width={600}>
+            <Typography variant="h6" gutterBottom>
+              Add New Rumor
+            </Typography>
+            <TextField
+              variant="outlined"
+              label="Player Name"
+              value={newRumor.playerName}
+              onChange={(e) => handleRumorChange("playerName", e.target.value)}
+              fullWidth
+              margin="normal"
+            />
+            <FormControl variant="outlined" fullWidth margin="normal">
+              <InputLabel>Trade Reason</InputLabel>
+              <Select
+                value={newRumor.tradeReason}
+                onChange={(e) =>
+                  handleRumorChange("tradeReason", e.target.value)
+                }
+                label="Trade Reason"
+              >
+                {tradeReasons.map((reason, index) => (
+                  <MenuItem key={index} value={reason}>
+                    {reason}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            <Typography variant="h6" gutterBottom>
+              Rumored Teams
+            </Typography>
+            {newRumor.rumoredTeams.map((team, index) => (
+              <Box key={index} mt={2}>
+                <FormControl variant="outlined" fullWidth margin="normal">
+                  <InputLabel>Team</InputLabel>
+                  <Select
+                    value={team.teamId}
+                    onChange={(e) =>
+                      handleRumoredTeamChange(index, "teamId", e.target.value)
+                    }
+                    label="Team"
+                  >
+                    {teamsData.map((teamOption, i) => (
+                      <MenuItem key={i} value={teamOption._id}>
+                        {teamOption.city + " " + teamOption.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+                <TextField
+                  variant="outlined"
+                  label="Chance (%)"
+                  type="number"
+                  value={team.chance}
+                  onChange={(e) =>
+                    handleRumoredTeamChange(index, "chance", e.target.value)
+                  }
+                  fullWidth
+                  margin="normal"
+                />
+                <Typography variant="subtitle1">Links</Typography>
+                {team.links.map((link, linkIndex) => (
+                  <Box
+                    key={linkIndex}
+                    display="flex"
+                    alignItems="center"
+                    mt={1}
+                  >
+                    <TextField
+                      variant="outlined"
+                      label="Media Source"
+                      value={link.title}
+                      onChange={(e) =>
+                        handleLinkChange(
+                          index,
+                          linkIndex,
+                          "title",
+                          e.target.value
+                        )
+                      }
+                      margin="normal"
+                      fullWidth
+                      style={{ marginRight: 8 }}
+                    />
+                    <TextField
+                      variant="outlined"
+                      label="Link URL"
+                      value={link.url}
+                      onChange={(e) =>
+                        handleLinkChange(
+                          index,
+                          linkIndex,
+                          "url",
+                          e.target.value
+                        )
+                      }
+                      margin="normal"
+                      fullWidth
+                    />
+                  </Box>
+                ))}
+                <Button
+                  variant="contained"
+                  color="secondary"
+                  onClick={() => handleAddLink(index)}
+                  fullWidth
+                >
+                  Add Link
+                </Button>
+              </Box>
+            ))}
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleAddRumoredTeam}
+              fullWidth
+              style={{ marginTop: 16 }}
+            >
+              Add Rumored Team
+            </Button>
+            <Box mt={2} display="flex" justifyContent="space-between">
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleSaveRumor}
+              >
+                Save
+              </Button>
+              <Button
+                variant="outlined"
+                color="secondary"
+                onClick={handlePopoverClose}
+              >
+                Cancel
+              </Button>
+            </Box>
+          </Box>
+        </Popover>
       </Box>
-      <TableContainer component={Paper} elevation={3}>
+      <TableContainer component={Paper}>
         <Table>
           <TableHead>
             <TableRow>
               <TableCell align="center">
-                <Typography variant="subtitle1">
-                  <b>Player Name</b>
-                </Typography>
+                <b>Player Name</b>
               </TableCell>
               <TableCell align="center">
-                <Typography variant="subtitle1">
-                  <b>Trade Reason</b>
-                </Typography>
+                <b>Trade Reason</b>
               </TableCell>
               <TableCell align="center">
-                <Typography variant="subtitle1">
-                  <b>Rumored Teams</b>
-                </Typography>
+                <b>Rumored Teams</b>
               </TableCell>
               <TableCell align="center">
-                <Typography variant="subtitle1">
-                  <b>Action</b>
-                </Typography>
+                <b>Action</b>
               </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {rumors.map((rumor, rumorIndex) => (
               <TableRow key={rumorIndex}>
+                <TableCell>{rumor.playerName}</TableCell>
+                <TableCell>{rumor.tradeReason}</TableCell>
                 <TableCell>
-                  <TextField
-                    variant="outlined"
-                    value={rumor.playerName}
-                    onChange={(e) =>
-                      handleRumorChange(
-                        rumorIndex,
-                        "playerName",
-                        e.target.value
-                      )
-                    }
-                    placeholder="Player Name"
-                    fullWidth
-                    margin="normal"
-                  />
-                </TableCell>
-                <TableCell>
-                  <FormControl variant="outlined" fullWidth margin="normal">
-                    <InputLabel>Trade Reason</InputLabel>
-                    <Select
-                      value={rumor.tradeReason}
-                      onChange={(e) =>
-                        handleRumorChange(
-                          rumorIndex,
-                          "tradeReason",
-                          e.target.value
-                        )
-                      }
-                      label="Trade Reason"
-                    >
-                      {teamTradeReasons
-                        .concat(playerTradeReasons)
-                        .map((reason, index) => (
-                          <MenuItem key={index} value={reason}>
-                            {reason}
-                          </MenuItem>
-                        ))}
-                    </Select>
-                  </FormControl>
-                </TableCell>
-                <TableCell>
-                  <Grid container spacing={2}>
+                  <ul>
                     {rumor.rumoredTeams.map((team, teamIndex) => (
-                      <Grid item xs={12} key={teamIndex}>
-                        <Paper variant="outlined" sx={{ p: 2 }}>
-                          <FormControl
-                            variant="outlined"
-                            fullWidth
-                            margin="normal"
-                          >
-                            <InputLabel>Team</InputLabel>
-                            <Select
-                              value={team.team}
-                              onChange={(e) =>
-                                handleRumoredTeamChange(
-                                  rumorIndex,
-                                  teamIndex,
-                                  "team",
-                                  e.target.value
-                                )
-                              }
-                              label="Team"
-                            >
-                              {teams.map((teamName, index) => (
-                                <MenuItem key={index} value={teamName}>
-                                  {teamName}
-                                </MenuItem>
-                              ))}
-                            </Select>
-                          </FormControl>
-                          <TextField
-                            type="number"
-                            label="Chance (%)"
-                            variant="outlined"
-                            value={team.chance}
-                            onChange={(e) =>
-                              handleRumoredTeamChange(
-                                rumorIndex,
-                                teamIndex,
-                                "chance",
-                                e.target.value
-                              )
-                            }
-                            fullWidth
-                            margin="normal"
-                          />
-                          <Grid container spacing={2}>
-                            {team.links.map((link, linkIndex) => (
-                              <Grid item xs={12} key={linkIndex}>
-                                <Stack
-                                  direction="row"
-                                  spacing={2}
-                                  alignItems="center"
-                                >
-                                  <TextField
-                                    label="Link Title"
-                                    variant="outlined"
-                                    value={link.title}
-                                    onChange={(e) =>
-                                      handleLinkChange(
-                                        rumorIndex,
-                                        teamIndex,
-                                        linkIndex,
-                                        "title",
-                                        e.target.value
-                                      )
-                                    }
-                                    fullWidth
-                                  />
-                                  <TextField
-                                    label="Link URL"
-                                    variant="outlined"
-                                    value={link.url}
-                                    onChange={(e) =>
-                                      handleLinkChange(
-                                        rumorIndex,
-                                        teamIndex,
-                                        linkIndex,
-                                        "url",
-                                        e.target.value
-                                      )
-                                    }
-                                    fullWidth
-                                  />
-                                  <IconButton
-                                    color="secondary"
-                                    onClick={() =>
-                                      handleRemoveLink(
-                                        rumorIndex,
-                                        teamIndex,
-                                        linkIndex
-                                      )
-                                    }
-                                  >
-                                    <Delete />
-                                  </IconButton>
-                                </Stack>
-                              </Grid>
-                            ))}
-                            <Grid item xs={12}>
-                              <Button
-                                variant="contained"
-                                color="primary"
-                                startIcon={<Add />}
-                                onClick={() =>
-                                  handleAddLink(rumorIndex, teamIndex)
-                                }
-                                fullWidth
+                      <li key={teamIndex}>
+                        {team.teamName} - {team.chance}%
+                        <ul>
+                          {team.links.map((link, linkIndex) => (
+                            <li key={linkIndex}>
+                              <a
+                                href={link.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
                               >
-                                Add Link
-                              </Button>
-                            </Grid>
-                          </Grid>
-                          <Divider sx={{ my: 2 }} />
-                          <Button
-                            variant="contained"
-                            color="secondary"
-                            startIcon={<Delete />}
-                            onClick={() =>
-                              handleRemoveTeam(rumorIndex, teamIndex)
-                            }
-                            fullWidth
-                          >
-                            Remove Team
-                          </Button>
-                        </Paper>
-                      </Grid>
+                                {link.title}
+                              </a>
+                            </li>
+                          ))}
+                        </ul>
+                      </li>
                     ))}
-                    <Grid item xs={12}>
-                      <Button
-                        variant="contained"
-                        color="primary"
-                        startIcon={<Add />}
-                        onClick={() => handleAddTeam(rumorIndex)}
-                        fullWidth
-                      >
-                        Add Team
-                      </Button>
-                    </Grid>
-                  </Grid>
+                  </ul>
                 </TableCell>
                 <TableCell align="center">
                   <IconButton
-                    color="error"
+                    aria-label="delete"
+                    color="secondary"
                     onClick={() => handleRemoveRumor(rumorIndex)}
                   >
                     <Delete />
