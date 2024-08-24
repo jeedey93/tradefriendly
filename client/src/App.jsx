@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Home from "./pages/Home";
 import Teams from "./pages/Teams";
 import Rumors from "./pages/Rumors";
+import AdminRumors from "./pages/admin/AdminRumors";
 import Players from "./pages/Players";
 import TeamPage from "./pages/TeamPage";
 import PlayerPage from "./pages/PlayerPage";
@@ -46,9 +47,11 @@ function App() {
             <Route path="/fantasyPool" element={<FantasyPool />} />
             <Route path="/draftTracker" element={<DraftTracker />} />
             <Route path="/players" element={<Players />} />
-            {/* Dynamic route */}
+            {/* Dynamic routes */}
             <Route path="/teams/:teamCode" element={<TeamPage />} />{" "}
             <Route path="/players/:playerCode" element={<PlayerPage />} />{" "}
+            {/* Admin routes */}
+            <Route path="/admin/rumors" element={<AdminRumors />} />
           </Routes>
         </Router>
       </div>

@@ -4,6 +4,7 @@ import mongoose from "./db.js"; // Ensure this is correctly connecting to MongoD
 import teamRoutes from "./routes/teams.js";
 import playersRoutes from "./routes/players.js";
 import nhlRoutes from "./routes/nhlstats.js";
+import rumorsRoutes from "./routes/rumors.js";
 
 const app = express();
 
@@ -13,6 +14,10 @@ app.use(express.json());
 // Route prefixes
 app.use("/api", teamRoutes);
 app.use("/api", playersRoutes);
+app.use("/api", nhlRoutes);
+app.use("/api", rumorsRoutes);
+
+// NHL Stats API endpoint
 app.use("/nhl", nhlRoutes);
 
 // Error handling middleware

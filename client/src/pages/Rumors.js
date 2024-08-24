@@ -54,6 +54,7 @@ function Rumors() {
       tradeReason: "Personal Reasons",
       rumoredTeams: [
         {
+          teamId: 1,
           name: "Toronto Maple Leafs",
           logo: "https://upload.wikimedia.org/wikipedia/en/thumb/9/9f/Toronto_Maple_Leafs_Logo_2016.svg/1200px-Toronto_Maple_Leafs_Logo_2016.svg.png",
           chance: 40,
@@ -69,6 +70,7 @@ function Rumors() {
           ],
         },
         {
+          teamId: 2,
           name: "Montreal Canadiens",
           logo: "https://upload.wikimedia.org/wikipedia/en/thumb/6/69/Montreal_Canadiens.svg/1200px-Montreal_Canadiens.svg.png",
           chance: 30,
@@ -84,6 +86,7 @@ function Rumors() {
           ],
         },
         {
+          teamId: 3,
           name: "Vancouver Canucks",
           logo: "https://upload.wikimedia.org/wikipedia/en/thumb/3/3a/Vancouver_Canucks_logo.svg/1200px-Vancouver_Canucks_logo.svg.png",
           chance: 30,
@@ -143,7 +146,7 @@ function Rumors() {
     },
     {
       id: 4,
-      playerName: "Artemi Pana",
+      playerName: "Artemi Panarin",
       playerImage: "https://assets.nhle.com/mugs/nhl/20232024/NYR/8478550.png",
       tradeReason: "Lack of Playing Time",
       rumoredTeams: [
