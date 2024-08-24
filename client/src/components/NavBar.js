@@ -47,6 +47,9 @@ function NavBar() {
               <Button color="inherit" component={Link} to="/teams">
                 Teams
               </Button>
+              <Button color="inherit" component={Link} to="/rumors">
+                Rumors
+              </Button>
               <Button color="inherit" component={Link} to="/tradeSimulator">
                 Trade Simulator
               </Button>
