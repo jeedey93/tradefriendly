@@ -33,6 +33,7 @@ function TeamPage() {
     forwards: [
       {
         title: "1st Line",
+        chemistry: 85,
         players: [
           {
             id: "player1",
@@ -56,6 +57,7 @@ function TeamPage() {
       },
       {
         title: "2nd Line",
+        chemistry: 80,
         players: [
           {
             id: "player4",
@@ -79,6 +81,7 @@ function TeamPage() {
       },
       {
         title: "3rd Line",
+        chemistry: 100,
         players: [
           {
             id: "player7",
@@ -102,6 +105,7 @@ function TeamPage() {
       },
       {
         title: "4th Line",
+        chemistry: 85,
         players: [
           {
             id: "player10",
@@ -127,6 +131,7 @@ function TeamPage() {
     defensemen: [
       {
         title: "1st Pair",
+        chemistry: 100,
         players: [
           {
             id: "def1",
@@ -144,6 +149,7 @@ function TeamPage() {
       },
       {
         title: "2nd Pair",
+        chemistry: 85,
         players: [
           {
             id: "def3",
@@ -161,6 +167,7 @@ function TeamPage() {
       },
       {
         title: "3rd Pair",
+        chemistry: 50,
         players: [
           {
             id: "def5",
@@ -178,13 +185,13 @@ function TeamPage() {
       },
     ],
     goalies: {
-      first: {
+      starter: {
         id: "goalie1",
         name: "Nathaniel Green",
         position: "Goaltender",
         overallRating: 90,
       },
-      second: {
+      backup: {
         id: "goalie2",
         name: "Connor Adams",
         position: "Goaltender",

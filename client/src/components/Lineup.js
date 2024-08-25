@@ -10,31 +10,35 @@ const Lineup = ({ lineup, onDragEnd }) => {
     if (selectedPlayer) {
       // Swap the selected player with the current player
       const newLineup = { ...lineup };
-      const temp = newLineup[section][sectionIndex].players[index];
-      newLineup[section][sectionIndex].players[index] = selectedPlayer;
-      newLineup[selectedPlayer.section][selectedPlayer.sectionIndex].players[
-        selectedPlayerIndex
-      ] = temp;
+      const temp = newLineup[section][sectionIndex]?.players[index];
+      if (temp) {
+        newLineup[section][sectionIndex].players[index] = selectedPlayer;
+        newLineup[selectedPlayer.section][selectedPlayer.sectionIndex].players[
+          selectedPlayerIndex
+        ] = temp;
 
-      // Update state with new lineup and reset selected player
-      onDragEnd(
-        {
-          source: {
-            index: selectedPlayerIndex,
-            droppableId: selectedPlayer.section,
+        // Update state with new lineup and reset selected player
+        onDragEnd(
+          {
+            source: {
+              index: selectedPlayerIndex,
+              droppableId: selectedPlayer.section,
+            },
+            destination: { index, droppableId: section },
           },
-          destination: { index, droppableId: section },
-        },
-        newLineup
-      );
-      setSelectedPlayer(null);
-      setSelectedPlayerIndex(null);
+          newLineup
+        );
+        setSelectedPlayer(null);
+        setSelectedPlayerIndex(null);
+      }
     } else {
       // Select the player
       setSelectedPlayer({ ...player, section, sectionIndex });
       setSelectedPlayerIndex(index);
     }
   };
+
+  if (!lineup) return <Typography>Loading...</Typography>;
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
@@ -59,7 +63,7 @@ const Lineup = ({ lineup, onDragEnd }) => {
               <Typography variant="h6" gutterBottom>
                 Forwards
               </Typography>
-              {lineup.forwards.map((line, index) => (
+              {lineup.forwards?.map((line, index) => (
                 <Droppable
                   key={line.title}
                   droppableId={line.title}
@@ -85,8 +89,11 @@ const Lineup = ({ lineup, onDragEnd }) => {
                         <Typography variant="h6" gutterBottom>
                           {line.title}
                         </Typography>
+                        <Typography variant="body2" color="textSecondary">
+                          Chemistry: {line.chemistry || "N/A"}
+                        </Typography>
                       </Box>
-                      {line.players.map((player, playerIndex) => (
+                      {line.players?.map((player, playerIndex) => (
                         <Draggable
                           key={player.id}
                           draggableId={player.id}
@@ -123,13 +130,13 @@ const Lineup = ({ lineup, onDragEnd }) => {
                             >
                               <CardContent>
                                 <Typography variant="body1" component="div">
-                                  {player.name}
+                                  {player.name || "Unnamed Player"}
                                 </Typography>
                                 <Typography
                                   variant="body2"
                                   color="textSecondary"
                                 >
-                                  {player.position}
+                                  {player.position || "N/A"}
                                 </Typography>
                                 <Typography
                                   variant="body2"
@@ -172,7 +179,7 @@ const Lineup = ({ lineup, onDragEnd }) => {
               <Typography variant="h6" gutterBottom>
                 Defensemen
               </Typography>
-              {lineup.defensemen.map((pair, index) => (
+              {lineup.defensemen?.map((pair, index) => (
                 <Droppable
                   key={pair.title}
                   droppableId={pair.title}
@@ -198,8 +205,11 @@ const Lineup = ({ lineup, onDragEnd }) => {
                         <Typography variant="h6" gutterBottom>
                           {pair.title}
                         </Typography>
+                        <Typography variant="body2" color="textSecondary">
+                          Chemistry: {pair.chemistry || "N/A"}
+                        </Typography>
                       </Box>
-                      {pair.players.map((player, playerIndex) => (
+                      {pair.players?.map((player, playerIndex) => (
                         <Draggable
                           key={player.id}
                           draggableId={player.id}
@@ -236,13 +246,13 @@ const Lineup = ({ lineup, onDragEnd }) => {
                             >
                               <CardContent>
                                 <Typography variant="body1" component="div">
-                                  {player.name}
+                                  {player.name || "Unnamed Player"}
                                 </Typography>
                                 <Typography
                                   variant="body2"
                                   color="textSecondary"
                                 >
-                                  {player.position}
+                                  {player.position || "N/A"}
                                 </Typography>
                                 <Typography
                                   variant="body2"
@@ -285,131 +295,219 @@ const Lineup = ({ lineup, onDragEnd }) => {
               <Typography variant="h6" gutterBottom>
                 Goalies
               </Typography>
-              <Droppable droppableId="goalies-first">
+              <Droppable droppableId="goalies-starter">
                 {(provided) => (
                   <Box
                     ref={provided.innerRef}
                     {...provided.droppableProps}
-                    sx={{ mb: 2 }}
+                    sx={{
+                      display: "flex",
+                      flexDirection: "row",
+                      gap: 2,
+                      overflowX: "auto",
+                      mb: 2,
+                      border: "1px solid #ddd",
+                      borderRadius: 2,
+                      p: 2,
+                      backgroundColor: "#fff",
+                    }}
                   >
-                    <Typography variant="h6" gutterBottom>
-                      First Goalie
-                    </Typography>
-                    <Draggable
-                      key={lineup.goalies.first.id}
-                      draggableId={lineup.goalies.first.id}
-                      index={0}
-                    >
-                      {(provided) => (
-                        <Card
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                          {...provided.dragHandleProps}
-                          sx={{
-                            minWidth: 150,
-                            mb: 1,
-                            cursor: "pointer",
-                            backgroundColor:
-                              selectedPlayer &&
-                              selectedPlayer.id === lineup.goalies.first.id
-                                ? "lightblue"
-                                : "white",
-                            boxShadow:
-                              selectedPlayer &&
-                              selectedPlayer.id === lineup.goalies.first.id
-                                ? 3
-                                : 1,
-                          }}
-                          onClick={() =>
-                            handlePlayerClick(
-                              lineup.goalies.first,
-                              0,
-                              "goalies",
-                              0
-                            )
-                          }
-                        >
-                          <CardContent>
-                            <Typography variant="body1" component="div">
-                              {lineup.goalies.first.name}
-                            </Typography>
-                            <Typography variant="body2" color="textSecondary">
-                              {lineup.goalies.first.position}
-                            </Typography>
-                            <Typography variant="body2" color="textSecondary">
-                              Rating: {lineup.goalies.first.rating || "N/A"}
-                            </Typography>
-                          </CardContent>
-                        </Card>
-                      )}
-                    </Draggable>
+                    <Box sx={{ flex: 1 }}>
+                      <Typography variant="h6" gutterBottom>
+                        Starter
+                      </Typography>
+                    </Box>
+                    {lineup.goalies?.starter ? (
+                      <Card
+                        sx={{
+                          minWidth: 150,
+                          mb: 1,
+                          cursor: "pointer",
+                          backgroundColor:
+                            selectedPlayer &&
+                            selectedPlayer.id === lineup.goalies.starter.id
+                              ? "lightblue"
+                              : "white",
+                          boxShadow:
+                            selectedPlayer &&
+                            selectedPlayer.id === lineup.goalies.starter.id
+                              ? 3
+                              : 1,
+                        }}
+                        onClick={() =>
+                          handlePlayerClick(
+                            lineup.goalies.starter,
+                            0,
+                            "goalies",
+                            "starter"
+                          )
+                        }
+                      >
+                        <CardContent>
+                          <Typography variant="body1" component="div">
+                            {lineup.goalies.starter.name || "Unnamed Player"}
+                          </Typography>
+                          <Typography variant="body2" color="textSecondary">
+                            Rating: {lineup.goalies.starter.rating || "N/A"}
+                          </Typography>
+                        </CardContent>
+                      </Card>
+                    ) : (
+                      <Typography>No Starter Available</Typography>
+                    )}
                     {provided.placeholder}
                   </Box>
                 )}
               </Droppable>
-              <Droppable droppableId="goalies-second">
+              <Droppable droppableId="goalies-backup">
                 {(provided) => (
                   <Box
                     ref={provided.innerRef}
                     {...provided.droppableProps}
-                    sx={{ mb: 2 }}
+                    sx={{
+                      display: "flex",
+                      flexDirection: "row",
+                      gap: 2,
+                      overflowX: "auto",
+                      mb: 2,
+                      border: "1px solid #ddd",
+                      borderRadius: 2,
+                      p: 2,
+                      backgroundColor: "#fff",
+                    }}
                   >
-                    <Typography variant="h6" gutterBottom>
-                      Backup Goalie
-                    </Typography>
-                    <Draggable
-                      key={lineup.goalies.second.id}
-                      draggableId={lineup.goalies.second.id}
-                      index={0}
-                    >
-                      {(provided) => (
-                        <Card
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                          {...provided.dragHandleProps}
-                          sx={{
-                            minWidth: 150,
-                            mb: 1,
-                            cursor: "pointer",
-                            backgroundColor:
-                              selectedPlayer &&
-                              selectedPlayer.id === lineup.goalies.second.id
-                                ? "lightblue"
-                                : "white",
-                            boxShadow:
-                              selectedPlayer &&
-                              selectedPlayer.id === lineup.goalies.second.id
-                                ? 3
-                                : 1,
-                          }}
-                          onClick={() =>
-                            handlePlayerClick(
-                              lineup.goalies.second,
-                              0,
-                              "goalies",
-                              1
-                            )
-                          }
-                        >
-                          <CardContent>
-                            <Typography variant="body1" component="div">
-                              {lineup.goalies.second.name}
-                            </Typography>
-                            <Typography variant="body2" color="textSecondary">
-                              {lineup.goalies.second.position}
-                            </Typography>
-                            <Typography variant="body2" color="textSecondary">
-                              Rating: {lineup.goalies.second.rating || "N/A"}
-                            </Typography>
-                          </CardContent>
-                        </Card>
-                      )}
-                    </Draggable>
+                    <Box sx={{ flex: 1 }}>
+                      <Typography variant="h6" gutterBottom>
+                        Backup
+                      </Typography>
+                    </Box>
+                    {lineup.goalies?.backup ? (
+                      <Card
+                        sx={{
+                          minWidth: 150,
+                          mb: 1,
+                          cursor: "pointer",
+                          backgroundColor:
+                            selectedPlayer &&
+                            selectedPlayer.id === lineup.goalies.backup.id
+                              ? "lightblue"
+                              : "white",
+                          boxShadow:
+                            selectedPlayer &&
+                            selectedPlayer.id === lineup.goalies.backup.id
+                              ? 3
+                              : 1,
+                        }}
+                        onClick={() =>
+                          handlePlayerClick(
+                            lineup.goalies.backup,
+                            0,
+                            "goalies",
+                            "backup"
+                          )
+                        }
+                      >
+                        <CardContent>
+                          <Typography variant="body1" component="div">
+                            {lineup.goalies.backup.name || "Unnamed Player"}
+                          </Typography>
+                          <Typography variant="body2" color="textSecondary">
+                            Rating: {lineup.goalies.backup.rating || "N/A"}
+                          </Typography>
+                        </CardContent>
+                      </Card>
+                    ) : (
+                      <Typography>No Backup Available</Typography>
+                    )}
                     {provided.placeholder}
                   </Box>
                 )}
               </Droppable>
               {provided.placeholder}
+            </Box>
+          )}
+        </Droppable>
+
+        {/* Reserves Section */}
+        <Droppable droppableId="reserves" type="COLUMN">
+          {(provided) => (
+            <Box
+              ref={provided.innerRef}
+              {...provided.droppableProps}
+              sx={{
+                border: "1px solid #ddd",
+                borderRadius: 2,
+                p: 2,
+                mt: 3,
+                display: "flex",
+                flexDirection: "column",
+                gap: 2,
+                backgroundColor: "#f5f5f5",
+              }}
+            >
+              <Typography variant="h6" gutterBottom>
+                Reserves
+              </Typography>
+              <Box
+                ref={provided.innerRef}
+                {...provided.droppableProps}
+                sx={{
+                  display: "flex",
+                  flexDirection: "row",
+                  gap: 2,
+                  overflowX: "auto",
+                  mb: 2,
+                  border: "1px solid #ddd",
+                  borderRadius: 2,
+                  p: 2,
+                  backgroundColor: "#fff",
+                }}
+              >
+                {lineup.reserves?.map((player, playerIndex) => (
+                  <Draggable
+                    key={player.id}
+                    draggableId={player.id}
+                    index={playerIndex}
+                  >
+                    {(provided) => (
+                      <Card
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        {...provided.dragHandleProps}
+                        sx={{
+                          minWidth: 150,
+                          mb: 1,
+                          cursor: "pointer",
+                          backgroundColor:
+                            selectedPlayer && selectedPlayer.id === player.id
+                              ? "lightblue"
+                              : "white",
+                          boxShadow:
+                            selectedPlayer && selectedPlayer.id === player.id
+                              ? 3
+                              : 1,
+                        }}
+                        onClick={() =>
+                          handlePlayerClick(player, playerIndex, "reserves")
+                        }
+                      >
+                        <CardContent>
+                          <Typography variant="body1" component="div">
+                            {player.name || "Unnamed Player"}
+                          </Typography>
+                          <Typography variant="body2" color="textSecondary">
+                            {player.position || "N/A"}
+                          </Typography>
+                          <Typography variant="body2" color="textSecondary">
+                            Rating: {player.rating || "N/A"}
+                          </Typography>
+                        </CardContent>
+                      </Card>
+                    )}
+                  </Draggable>
+                ))}
+                {provided.placeholder}
+              </Box>
             </Box>
           )}
         </Droppable>
