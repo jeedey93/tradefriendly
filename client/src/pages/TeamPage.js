@@ -246,32 +246,35 @@ function TeamPage() {
   };
 
   const onDragEnd = (result) => {
-    if (!result.destination) return;
+    const { destination, source, draggableId, type } = result;
 
-    const { source, destination } = result;
-    const { droppableId: sourceDroppableId, index: sourceIndex } = source;
-    const { droppableId: destinationDroppableId, index: destinationIndex } =
-      destination;
+    // If there's no destination (dropped outside the list), do nothing
+    if (!destination) return;
 
-    // Handle the drag and drop logic
-    if (sourceDroppableId === destinationDroppableId) {
+    // Reorder only within the same droppable
+    if (type === "COLUMN") {
+      // Handle reordering for forwards and defensemen sections
+      if (source.droppableId !== destination.droppableId) return; // Can only reorder within the same section
+
+      const startIndex = source.index;
+      const endIndex = destination.index;
+
+      // Update the lineup based on the source and destination
       const updatedLineup = { ...lineup };
-      const line = updatedLineup[sourceDroppableId];
+      const section = updatedLineup[source.droppableId];
 
-      const [movedPlayer] = line.players.splice(sourceIndex, 1);
-      line.players.splice(destinationIndex, 0, movedPlayer);
+      const [movedPlayer] = section.players.splice(startIndex, 1);
+      section.players.splice(endIndex, 0, movedPlayer);
 
-      setLineup(updatedLineup);
-    } else {
-      const updatedLineup = { ...lineup };
-      const sourceLine = updatedLineup[sourceDroppableId];
-      const destinationLine = updatedLineup[destinationDroppableId];
-
-      const [movedPlayer] = sourceLine.players.splice(sourceIndex, 1);
-      destinationLine.players.splice(destinationIndex, 0, movedPlayer);
-
-      setLineup(updatedLineup);
+      // Call your function to update the state or data source here
+      updateLineup(updatedLineup);
     }
+  };
+
+  // Example of how to use the `updateLineup` function
+  const updateLineup = (updatedLineup) => {
+    // Update the state or backend with the new lineup
+    console.log("Updated Lineup:", updatedLineup);
   };
 
   if (loading) {
@@ -302,7 +305,7 @@ function TeamPage() {
           <Tab label="Overview" />
           <Tab label="Strengths & Weaknesses" />
           <Tab label="Tradeblock" />
-          <Tab label="Lineup Compatibility" />
+          <Tab label="Lineup" />
           <Tab label="Contracts" />
         </Tabs>
       </Box>
