@@ -6,9 +6,9 @@ const playerSchema = new mongoose.Schema({
   points: { type: Number, required: true },
   position: { type: String, required: true },
   teamAbbrev: { type: String, required: true },
-  capHit: { type: Number, default: null }, // Some players might not have this field
-  yearsLeft: { type: Number, default: null }, // Some players might not have this field
-  overallScore: { type: Number, default: null }, // Some players might not have this field
+  capHit: { type: Number, default: null },
+  yearsLeft: { type: Number, default: null },
+  overallScore: { type: Number, default: null },
 });
 
 // Create and export the Player model

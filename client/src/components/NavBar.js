@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
@@ -8,9 +8,20 @@ import MenuIcon from "@mui/icons-material/Menu";
 import Box from "@mui/material/Box";
 import { Link } from "react-router-dom";
 import SportsHockeyIcon from "@mui/icons-material/SportsHockey";
-import { CssBaseline, Container } from "@mui/material";
+import { CssBaseline, Container, Menu, MenuItem } from "@mui/material";
 
 function NavBar() {
+  const [anchorEl, setAnchorEl] = useState(null);
+  const open = Boolean(anchorEl);
+
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
   return (
     <>
       <CssBaseline />
@@ -47,6 +58,9 @@ function NavBar() {
               <Button color="inherit" component={Link} to="/teams">
                 Teams
               </Button>
+              <Button color="inherit" component={Link} to="/rumors">
+                Rumors
+              </Button>
               <Button color="inherit" component={Link} to="/tradeSimulator">
                 Trade Simulator
               </Button>
@@ -56,9 +70,31 @@ function NavBar() {
               <Button color="inherit" component={Link} to="/draftTracker">
                 Draft Tracker
               </Button>
-              <Button color="inherit" component={Link} to="/players">
-                Players
+              <Button
+                color="inherit"
+                onClick={handleClick}
+                aria-controls={open ? "admin-menu" : undefined}
+                aria-haspopup="true"
+              >
+                Admin
               </Button>
+              <Menu
+                id="admin-menu"
+                anchorEl={anchorEl}
+                open={open}
+                onClose={handleClose}
+              >
+                <MenuItem
+                  component={Link}
+                  to="/admin/rumors"
+                  onClick={handleClose}
+                >
+                  Rumors
+                </MenuItem>
+                <MenuItem component={Link} to="/players" onClick={handleClose}>
+                  Players
+                </MenuItem>
+              </Menu>
             </Box>
           </Toolbar>
         </Container>

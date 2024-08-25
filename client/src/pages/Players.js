@@ -16,7 +16,9 @@ import {
   Alert,
   Container,
   Pagination,
+  IconButton,
 } from "@mui/material";
+import { ArrowDownward, ArrowUpward, Sort } from "@mui/icons-material";
 
 function Players() {
   const [players, setPlayers] = useState([]);
@@ -25,6 +27,8 @@ function Players() {
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [sortColumn, setSortColumn] = useState("name");
+  const [sortDirection, setSortDirection] = useState("asc");
   const itemsPerPage = 50;
 
   const fetchDatabasePlayers = () => {
@@ -78,7 +82,6 @@ function Players() {
   const handleSave = () => {
     const updatedPlayers = players.map(({ id, ...rest }) => ({ id, ...rest }));
 
-    // Save data to the server
     fetch("/api/players", {
       method: "POST",
       headers: {
@@ -88,7 +91,7 @@ function Players() {
     })
       .then(() => {
         setSnackbarMessage("Players saved successfully!");
-        setOpenSnackbar(true); // Show success message
+        setOpenSnackbar(true);
       })
       .catch((error) => {
         setError("Error saving players data: " + error.message);
@@ -107,28 +110,30 @@ function Players() {
     setCurrentPage(value);
   };
 
-  if (loading)
-    return (
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        height="100vh"
-      >
-        <CircularProgress />
-      </Box>
-    );
+  const handleSort = (column) => {
+    const isAsc = sortColumn === column && sortDirection === "asc";
+    setSortDirection(isAsc ? "desc" : "asc");
+    setSortColumn(column);
+  };
 
-  if (error)
-    return (
-      <Typography color="error" variant="h6" align="center" mt={2}>
-        {error}
-      </Typography>
-    );
+  const sortedPlayers = [...players].sort((a, b) => {
+    if (
+      sortColumn === "points" ||
+      sortColumn === "overallScore" ||
+      sortColumn === "capHit"
+    ) {
+      return sortDirection === "asc"
+        ? a[sortColumn] - b[sortColumn]
+        : b[sortColumn] - a[sortColumn];
+    }
+    return 0;
+  });
 
-  // Calculate the data to display based on pagination
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedPlayers = players.slice(startIndex, startIndex + itemsPerPage);
+  const paginatedPlayers = sortedPlayers.slice(
+    startIndex,
+    startIndex + itemsPerPage
+  );
   const totalPages = Math.ceil(players.length / itemsPerPage);
 
   return (
@@ -153,9 +158,54 @@ function Players() {
               <TableRow>
                 <TableCell>#</TableCell>
                 <TableCell>Name</TableCell>
-                <TableCell align="right">Points</TableCell>
-                <TableCell align="right">Overall Score</TableCell>
-                <TableCell align="right">Cap Hit</TableCell>
+                <TableCell
+                  align="right"
+                  onClick={() => handleSort("points")}
+                  sx={{ cursor: "pointer", fontWeight: "bold" }}
+                >
+                  Points{" "}
+                  {sortColumn === "points" && (
+                    <IconButton size="small">
+                      {sortDirection === "asc" ? (
+                        <ArrowUpward />
+                      ) : (
+                        <ArrowDownward />
+                      )}
+                    </IconButton>
+                  )}
+                </TableCell>
+                <TableCell
+                  align="right"
+                  onClick={() => handleSort("overallScore")}
+                  sx={{ cursor: "pointer", fontWeight: "bold" }}
+                >
+                  Overall Score{" "}
+                  {sortColumn === "overallScore" && (
+                    <IconButton size="small">
+                      {sortDirection === "asc" ? (
+                        <ArrowUpward />
+                      ) : (
+                        <ArrowDownward />
+                      )}
+                    </IconButton>
+                  )}
+                </TableCell>
+                <TableCell
+                  align="right"
+                  onClick={() => handleSort("capHit")}
+                  sx={{ cursor: "pointer", fontWeight: "bold" }}
+                >
+                  Cap Hit{" "}
+                  {sortColumn === "capHit" && (
+                    <IconButton size="small">
+                      {sortDirection === "asc" ? (
+                        <ArrowUpward />
+                      ) : (
+                        <ArrowDownward />
+                      )}
+                    </IconButton>
+                  )}
+                </TableCell>
                 <TableCell align="right">Number Of Years Left</TableCell>
               </TableRow>
             </TableHead>
