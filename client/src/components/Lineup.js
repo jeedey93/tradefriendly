@@ -72,6 +72,7 @@ const Lineup = ({ lineup, onDragEnd }) => {
                                   p: 2,
                                   mb: 1,
                                   display: "flex",
+                                  flexDirection: "column",
                                   alignItems: "center",
                                   justifyContent: "center",
                                   borderRadius: 1,
@@ -80,7 +81,18 @@ const Lineup = ({ lineup, onDragEnd }) => {
                                   cursor: "grab",
                                 }}
                               >
-                                {player.name}
+                                <Typography
+                                  variant="body1"
+                                  sx={{ fontWeight: "bold" }}
+                                >
+                                  {player.name}
+                                </Typography>
+                                <Typography variant="body2">
+                                  {player.position}
+                                </Typography>
+                                <Typography variant="body2">
+                                  Rating: {player.overallRating}
+                                </Typography>
                               </Paper>
                             )}
                           </Draggable>
@@ -162,6 +174,7 @@ const Lineup = ({ lineup, onDragEnd }) => {
                                   p: 2,
                                   mb: 1,
                                   display: "flex",
+                                  flexDirection: "column",
                                   alignItems: "center",
                                   justifyContent: "center",
                                   borderRadius: 1,
@@ -170,7 +183,18 @@ const Lineup = ({ lineup, onDragEnd }) => {
                                   cursor: "grab",
                                 }}
                               >
-                                {player.name}
+                                <Typography
+                                  variant="body1"
+                                  sx={{ fontWeight: "bold" }}
+                                >
+                                  {player.name}
+                                </Typography>
+                                <Typography variant="body2">
+                                  {player.position}
+                                </Typography>
+                                <Typography variant="body2">
+                                  Rating: {player.overallRating}
+                                </Typography>
                               </Paper>
                             )}
                           </Draggable>
@@ -234,6 +258,7 @@ const Lineup = ({ lineup, onDragEnd }) => {
                           p: 2,
                           mb: 1,
                           display: "flex",
+                          flexDirection: "column",
                           alignItems: "center",
                           justifyContent: "center",
                           borderRadius: 1,
@@ -242,7 +267,15 @@ const Lineup = ({ lineup, onDragEnd }) => {
                           cursor: "grab",
                         }}
                       >
-                        {lineup.goalies.first.name}
+                        <Typography variant="body1" sx={{ fontWeight: "bold" }}>
+                          {lineup.goalies.first.name}
+                        </Typography>
+                        <Typography variant="body2">
+                          {lineup.goalies.first.position}
+                        </Typography>
+                        <Typography variant="body2">
+                          Rating: {lineup.goalies.first.overallRating}
+                        </Typography>
                       </Paper>
                     )}
                   </Draggable>
@@ -260,6 +293,7 @@ const Lineup = ({ lineup, onDragEnd }) => {
                           p: 2,
                           mb: 1,
                           display: "flex",
+                          flexDirection: "column",
                           alignItems: "center",
                           justifyContent: "center",
                           borderRadius: 1,
@@ -268,7 +302,15 @@ const Lineup = ({ lineup, onDragEnd }) => {
                           cursor: "grab",
                         }}
                       >
-                        {lineup.goalies.second.name}
+                        <Typography variant="body1" sx={{ fontWeight: "bold" }}>
+                          {lineup.goalies.second.name}
+                        </Typography>
+                        <Typography variant="body2">
+                          {lineup.goalies.second.position}
+                        </Typography>
+                        <Typography variant="body2">
+                          Rating: {lineup.goalies.second.overallRating}
+                        </Typography>
                       </Paper>
                     )}
                   </Draggable>
@@ -301,35 +343,60 @@ const Lineup = ({ lineup, onDragEnd }) => {
                   Reserves
                 </Typography>
                 <Divider sx={{ mb: 2 }} />
-                {lineup.reserves.map((player, playerIndex) => (
-                  <Draggable
-                    key={player.id}
-                    draggableId={player.id}
-                    index={playerIndex}
-                  >
-                    {(provided) => (
-                      <Paper
-                        ref={provided.innerRef}
-                        {...provided.draggableProps}
-                        {...provided.dragHandleProps}
-                        sx={{
-                          p: 2,
-                          mb: 1,
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          borderRadius: 1,
-                          backgroundColor: "#fff",
-                          boxShadow: 2,
-                          cursor: "grab",
-                        }}
-                      >
-                        {player.name}
-                      </Paper>
-                    )}
-                  </Draggable>
-                ))}
-                {provided.placeholder}
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "row",
+                    gap: 1,
+                    mb: 2,
+                    p: 1,
+                    borderRadius: 2,
+                    backgroundColor: "#fff",
+                    boxShadow: 1,
+                  }}
+                >
+                  {lineup.reserves.map((player, index) => (
+                    <Draggable
+                      key={player.id}
+                      draggableId={player.id}
+                      index={index}
+                    >
+                      {(provided) => (
+                        <Paper
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          {...provided.dragHandleProps}
+                          sx={{
+                            p: 2,
+                            mb: 1,
+                            display: "flex",
+                            flexDirection: "column",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            borderRadius: 1,
+                            backgroundColor: "#fff",
+                            boxShadow: 2,
+                            cursor: "grab",
+                          }}
+                        >
+                          <Typography
+                            variant="body1"
+                            sx={{ fontWeight: "bold" }}
+                          >
+                            {player.name}
+                          </Typography>
+                          <Typography variant="body2">
+                            {player.position}
+                          </Typography>
+                          <Typography variant="body2">
+                            Rating: {player.overallRating}
+                          </Typography>
+                        </Paper>
+                      )}
+                    </Draggable>
+                  ))}
+                  {provided.placeholder}
+                </Box>
               </Box>
             )}
           </Droppable>

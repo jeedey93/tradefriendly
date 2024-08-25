@@ -34,33 +34,93 @@ function TeamPage() {
       {
         title: "1st Line",
         players: [
-          { id: "player1", name: "Player One" },
-          { id: "player2", name: "Player Two" },
-          { id: "player3", name: "Player Three" },
+          {
+            id: "player1",
+            name: "Alex Johnson",
+            position: "Left Wing",
+            overallRating: 85,
+          },
+          {
+            id: "player2",
+            name: "Ryan Smith",
+            position: "Center",
+            overallRating: 88,
+          },
+          {
+            id: "player3",
+            name: "Dylan Carter",
+            position: "Right Wing",
+            overallRating: 87,
+          },
         ],
       },
       {
         title: "2nd Line",
         players: [
-          { id: "player4", name: "Player 4" },
-          { id: "player5", name: "Player 5" },
-          { id: "player6", name: "Player 6" },
+          {
+            id: "player4",
+            name: "Jordan Lee",
+            position: "Left Wing",
+            overallRating: 83,
+          },
+          {
+            id: "player5",
+            name: "Mason Davis",
+            position: "Center",
+            overallRating: 84,
+          },
+          {
+            id: "player6",
+            name: "Ethan Brown",
+            position: "Right Wing",
+            overallRating: 82,
+          },
         ],
       },
       {
         title: "3rd Line",
         players: [
-          { id: "player7", name: "Player 7" },
-          { id: "player8", name: "Player 8" },
-          { id: "player9", name: "Player 9" },
+          {
+            id: "player7",
+            name: "Liam Martinez",
+            position: "Left Wing",
+            overallRating: 80,
+          },
+          {
+            id: "player8",
+            name: "Noah Wilson",
+            position: "Center",
+            overallRating: 81,
+          },
+          {
+            id: "player9",
+            name: "Logan Anderson",
+            position: "Right Wing",
+            overallRating: 79,
+          },
         ],
       },
       {
         title: "4th Line",
         players: [
-          { id: "player10", name: "Player 10" },
-          { id: "player11", name: "Player 11" },
-          { id: "player12", name: "Player 12" },
+          {
+            id: "player10",
+            name: "Jack Thomas",
+            position: "Left Wing",
+            overallRating: 76,
+          },
+          {
+            id: "player11",
+            name: "Owen White",
+            position: "Center",
+            overallRating: 77,
+          },
+          {
+            id: "player12",
+            name: "Lucas Robinson",
+            position: "Right Wing",
+            overallRating: 75,
+          },
         ],
       },
     ],
@@ -68,34 +128,85 @@ function TeamPage() {
       {
         title: "1st Pair",
         players: [
-          { id: "def1", name: "Def1" },
-          { id: "def2", name: "Def2" },
+          {
+            id: "def1",
+            name: "Mikhail Ivanov",
+            position: "Defenseman",
+            overallRating: 89,
+          },
+          {
+            id: "def2",
+            name: "Tyler Brooks",
+            position: "Defenseman",
+            overallRating: 87,
+          },
         ],
       },
       {
         title: "2nd Pair",
         players: [
-          { id: "def3", name: "Def3" },
-          { id: "def4", name: "Def4" },
+          {
+            id: "def3",
+            name: "William Harris",
+            position: "Defenseman",
+            overallRating: 84,
+          },
+          {
+            id: "def4",
+            name: "James Thompson",
+            position: "Defenseman",
+            overallRating: 83,
+          },
         ],
       },
       {
         title: "3rd Pair",
         players: [
-          { id: "def5", name: "Def5" },
-          { id: "def6", name: "Def6" },
+          {
+            id: "def5",
+            name: "Alexander Lewis",
+            position: "Defenseman",
+            overallRating: 80,
+          },
+          {
+            id: "def6",
+            name: "Evan Young",
+            position: "Defenseman",
+            overallRating: 78,
+          },
         ],
       },
     ],
     goalies: {
-      first: { id: "goalie1", name: "Goalie One" },
-      second: { id: "goalie2", name: "Goalie Two" },
+      first: {
+        id: "goalie1",
+        name: "Nathaniel Green",
+        position: "Goaltender",
+        overallRating: 90,
+      },
+      second: {
+        id: "goalie2",
+        name: "Connor Adams",
+        position: "Goaltender",
+        overallRating: 88,
+      },
     },
     reserves: [
-      { id: "reserve1", name: "Reserve Player 1" },
-      { id: "reserve2", name: "Reserve Player 2" },
+      {
+        id: "reserve1",
+        name: "Zachary Scott",
+        position: "Forward",
+        overallRating: 74,
+      },
+      {
+        id: "reserve2",
+        name: "Benjamin Walker",
+        position: "Defenseman",
+        overallRating: 72,
+      },
     ],
   });
+
   const [contracts, setContracts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [tabIndex, setTabIndex] = useState(0);
