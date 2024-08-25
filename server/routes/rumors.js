@@ -47,6 +47,31 @@ router.post("/rumors", async (req, res) => {
   }
 });
 
+// DELETE route to delete a rumor by ID
+router.delete("/rumors/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Check if the ID is a valid ObjectId
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).send("Invalid rumor ID.");
+    }
+
+    // Delete the rumor from the database
+    const result = await Rumor.findByIdAndDelete(id);
+
+    // Check if the rumor was found and deleted
+    if (!result) {
+      return res.status(404).send("Rumor not found.");
+    }
+
+    res.status(200).send("Rumor deleted successfully.");
+  } catch (error) {
+    console.error("Error deleting rumor:", error);
+    res.status(500).send(error.message);
+  }
+});
+
 // GET route to get all rumors
 router.get("/rumors", async (req, res) => {
   try {

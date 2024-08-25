@@ -165,8 +165,22 @@ const AdminRumor = () => {
     }));
   };
 
-  const handleRemoveRumor = (index) => {
-    setRumors(rumors.filter((_, i) => i !== index));
+  const handleRemoveRumor = (id) => {
+    fetch(`/api/rumors/${id}`, {
+      method: "DELETE",
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Failed to delete rumor");
+        }
+        // Remove the rumor from the local state
+        setRumors(rumors.filter((rumor) => rumor._id !== id));
+        setSnackbarMessage("Rumor deleted successfully!");
+        setOpenSnackbar(true);
+      })
+      .catch((error) => {
+        setError("Error deleting rumor: " + error.message);
+      });
   };
 
   const handleAddLink = (teamIndex) => {
@@ -389,7 +403,7 @@ const AdminRumor = () => {
                   <TableCell>
                     <IconButton
                       color="secondary"
-                      onClick={() => handleRemoveRumor(index)}
+                      onClick={() => handleRemoveRumor(rumor._id)}
                     >
                       <Delete />
                     </IconButton>
