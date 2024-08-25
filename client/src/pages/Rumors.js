@@ -33,6 +33,7 @@ function Rumors() {
   const [teamNameMap, setTeamNameMap] = useState({});
   const [selectedTradeReason, setSelectedTradeReason] = useState("");
   const [selectedTeam, setSelectedTeam] = useState("");
+  const [selectedTradeBlock, setSelectedTradeBlock] = useState("");
   const [openDialog, setOpenDialog] = useState(false);
   const [currentTeamLinks, setCurrentTeamLinks] = useState([]);
 
@@ -82,9 +83,13 @@ function Rumors() {
     new Set(initialRumors.flatMap((r) => r.rumoredTeams.map((t) => t.teamId)))
   ).map((teamId) => teamNameMap[teamId]);
 
+  const tradeBlocks = Array.from(
+    new Set(initialRumors.flatMap((r) => r.currentTeamAbbrev))
+  );
+
   useEffect(() => {
-    filterRumors(selectedTradeReason, selectedTeam);
-  }, [selectedTradeReason, selectedTeam]);
+    filterRumors(selectedTradeReason, selectedTeam, selectedTradeBlock);
+  }, [selectedTradeReason, selectedTeam, selectedTradeBlock]);
 
   const handleTradeReasonChange = (event) => {
     setSelectedTradeReason(event.target.value);
@@ -94,7 +99,11 @@ function Rumors() {
     setSelectedTeam(event.target.value);
   };
 
-  const filterRumors = (tradeReason, team) => {
+  const handleTradeBlockChange = (event) => {
+    setSelectedTradeBlock(event.target.value);
+  };
+
+  const filterRumors = (tradeReason, team, tradeBlock) => {
     let filtered = initialRumors;
 
     if (tradeReason) {
@@ -105,6 +114,10 @@ function Rumors() {
       filtered = filtered.filter((r) =>
         r.rumoredTeams.some((t) => teamNameMap[t.teamId] === team)
       );
+    }
+
+    if (tradeBlock) {
+      filtered = filtered.filter((r) => r.currentTeamAbbrev === tradeBlock);
     }
 
     setFilteredRumors(filtered);
@@ -121,6 +134,11 @@ function Rumors() {
 
   const getTeamLogo = (teamId) => {
     const team = teamsData.find((t) => t._id === teamId);
+    return team ? team.logo : "";
+  };
+
+  const getTeamLogoFromTeamAbbrev = (teamAbbrev) => {
+    const team = teamsData.find((t) => t.abbreviation === teamAbbrev);
     return team ? team.logo : "";
   };
 
@@ -170,10 +188,13 @@ function Rumors() {
         <FilterBar
           tradeReasons={tradeReasons}
           teams={teams}
+          tradeBlocks={tradeBlocks}
+          selectedTradeBlock={selectedTradeBlock}
           selectedTradeReason={selectedTradeReason}
           selectedTeam={selectedTeam}
           onTradeReasonChange={handleTradeReasonChange}
           onTeamChange={handleTeamChange}
+          onTradeBlockChange={handleTradeBlockChange}
         />
 
         <Grid container spacing={4}>
@@ -187,13 +208,26 @@ function Rumors() {
                 }}
               >
                 <CardActionArea>
-                  <CardMedia
-                    component="img"
-                    height="140"
-                    image={rumor.playerImage}
-                    alt={rumor.playerName}
-                    sx={{ objectFit: "contain" }}
-                  />
+                  <Box sx={{ position: "relative" }}>
+                    <CardMedia
+                      component="img"
+                      height="140"
+                      image={rumor.playerImage}
+                      alt={rumor.playerName}
+                      sx={{ objectFit: "contain" }}
+                    />
+                    <Avatar
+                      src={getTeamLogoFromTeamAbbrev(rumor.currentTeamAbbrev)}
+                      sx={{
+                        position: "absolute",
+                        top: 8,
+                        right: 8,
+                        width: 56,
+                        height: 56,
+                        opacity: 1,
+                      }}
+                    />
+                  </Box>
                   <CardContent sx={{ flexGrow: 1 }}>
                     <Typography gutterBottom variant="h5" component="div">
                       {rumor.playerName}
@@ -225,29 +259,25 @@ function Rumors() {
                       Trade Value: {rumor.tradeValue}
                     </Typography>
                     <Box sx={{ mt: 2 }}>
-                      <Typography variant="h6">Rumored Teams</Typography>
-                      <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
-                        {rumor.rumoredTeams.map((team) => (
-                          <Box
-                            key={team.teamId}
-                            sx={{ display: "flex", alignItems: "center" }}
-                          >
-                            <Avatar
-                              src={getTeamLogo(team.teamId)}
-                              sx={{
-                                width: 56,
-                                height: 56,
-                                objectFit: "cover",
-                                mr: 1,
-                              }}
-                              onClick={() => handleAvatarClick(team.links)}
-                            />
-                            <Typography variant="body2" sx={{ mr: 1 }}>
-                              {teamNameMap[team.teamId]} - {team.chance}%
-                            </Typography>
-                          </Box>
-                        ))}
-                      </Box>
+                      {rumor.rumoredTeams.map((team) => (
+                        <IconButton
+                          key={team.teamId}
+                          onClick={() =>
+                            handleAvatarClick(
+                              rumor.rumoredTeams.map((t) => ({
+                                teamName: teamNameMap[t.teamId],
+                                link: t.teamLink,
+                              }))
+                            )
+                          }
+                        >
+                          <Avatar
+                            src={getTeamLogo(team.teamId)}
+                            alt={teamNameMap[team.teamId]}
+                            sx={{ width: 56, height: 56 }}
+                          />
+                        </IconButton>
+                      ))}
                     </Box>
                   </CardContent>
                 </CardActionArea>
@@ -255,59 +285,42 @@ function Rumors() {
             </Grid>
           ))}
         </Grid>
-      </Container>
 
-      <Dialog
-        open={openDialog}
-        onClose={handleCloseDialog}
-        maxWidth="sm"
-        fullWidth
-        PaperProps={{
-          sx: {
-            borderRadius: 2,
-            boxShadow: 3,
-          },
-        }}
-      >
-        <DialogTitle sx={{ display: "flex", alignItems: "center" }}>
-          <InfoIcon sx={{ mr: 1 }} />
-          <Typography variant="h6">Sources</Typography>
-          <IconButton
-            edge="end"
-            color="inherit"
-            onClick={handleCloseDialog}
-            sx={{ ml: "auto" }}
-          >
-            <CloseIcon />
-          </IconButton>
-        </DialogTitle>
-        <Divider />
-        <DialogContent>
-          <List>
-            {currentTeamLinks.map((link, index) => (
-              <ListItem key={index} sx={{ padding: 1 }}>
-                <ListItemIcon>
-                  <LinkIcon />
-                </ListItemIcon>
-                <ListItemText
-                  primary={
-                    <Typography
-                      component="a"
-                      href={convertToAbsoluteUrl(link.url)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      variant="body1"
-                      sx={{ textDecoration: "none", color: "primary.main" }}
-                    >
-                      {link.title}
-                    </Typography>
-                  }
-                />
-              </ListItem>
-            ))}
-          </List>
-        </DialogContent>
-      </Dialog>
+        <Dialog open={openDialog} onClose={handleCloseDialog}>
+          <DialogTitle>
+            Team Links
+            <IconButton
+              edge="end"
+              color="inherit"
+              onClick={handleCloseDialog}
+              aria-label="close"
+              sx={{ position: "absolute", right: 8, top: 8 }}
+            >
+              <CloseIcon />
+            </IconButton>
+          </DialogTitle>
+          <DialogContent>
+            <List>
+              {currentTeamLinks.map((teamLink) => (
+                <ListItem
+                  button
+                  component="a"
+                  href={convertToAbsoluteUrl(teamLink.link)}
+                  key={teamLink.teamName}
+                >
+                  <ListItemIcon>
+                    <Avatar
+                      src={getTeamLogoFromTeamAbbrev(teamLink.teamName)}
+                      alt={teamLink.teamName}
+                    />
+                  </ListItemIcon>
+                  <ListItemText primary={teamLink.teamName} />
+                </ListItem>
+              ))}
+            </List>
+          </DialogContent>
+        </Dialog>
+      </Container>
     </Box>
   );
 }

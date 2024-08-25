@@ -28,6 +28,7 @@ const rumoredTeamSchema = new mongoose.Schema(
 const rumorSchema = new mongoose.Schema({
   playerName: { type: String, required: true },
   playerImage: { type: String, required: true },
+  currentTeamAbbrev: { type: String, required: true },
   tradeReason: { type: String, required: true },
   rumoredTeams: [rumoredTeamSchema],
 });

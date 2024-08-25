@@ -1,4 +1,3 @@
-// FilterBar.js
 import React from "react";
 import {
   FormControl,
@@ -14,10 +13,13 @@ import {
 const FilterBar = ({
   tradeReasons,
   teams,
+  tradeBlocks, // Updated prop name
   selectedTradeReason,
   selectedTeam,
+  selectedTradeBlock,
   onTradeReasonChange,
   onTeamChange,
+  onTradeBlockChange,
 }) => {
   return (
     <Paper elevation={3} sx={{ padding: 2, marginBottom: 4 }}>
@@ -64,6 +66,31 @@ const FilterBar = ({
                   {team}
                 </MenuItem>
               ))}
+            </Select>
+          </FormControl>
+        </Grid>
+        <Grid item xs={12} sm={6} md={4}>
+          <FormControl fullWidth>
+            <InputLabel id="trade-block-label">Team Trade Block</InputLabel>
+            <Select
+              labelId="trade-block-label"
+              value={selectedTradeBlock}
+              onChange={onTradeBlockChange}
+              label="Team Trade Block"
+              sx={{ bgcolor: "background.default" }}
+            >
+              <MenuItem value="">
+                <em>All Trade Blocks</em>
+              </MenuItem>
+              {tradeBlocks.map(
+                (
+                  block // Updated to use tradeBlocks
+                ) => (
+                  <MenuItem key={block} value={block}>
+                    {block}
+                  </MenuItem>
+                )
+              )}
             </Select>
           </FormControl>
         </Grid>

@@ -30,20 +30,24 @@ router.post("/rumors", async (req, res) => {
       return res.status(404).send("Player does not exist.");
     }
 
-    // Determine player image
+    let currentTeamAbbrev; // Initialize the variable
+
+    // Determine player info
     try {
-      playerImage = await fetchPlayerHeadshot(player.id);
+      const playerInfo = await fetchPlayerInfo(player.id);
+      const { headshot, currentTeamAbbrev: teamAbbrev } = playerInfo;
+      playerImage = headshot;
+      currentTeamAbbrev = teamAbbrev;
     } catch (error) {
-      console.warn(
-        `Could not fetch headshot for player ${playerName}: ${error.message}`
-      );
       playerImage = "https://assets.nhle.com/mugs/nhl/default-skater.png";
+      console.error("Error fetching player info:", error);
     }
 
     // Create and save the new Rumor document
     const rumor = new Rumor({
       playerName,
       playerImage,
+      currentTeamAbbrev,
       tradeReason,
       rumoredTeams: rumoredTeams.map((team) => ({
         teamId: team.teamId,
@@ -95,7 +99,7 @@ router.get("/rumors", async (req, res) => {
   }
 });
 
-const fetchPlayerHeadshot = async (playerId) => {
+const fetchPlayerInfo = async (playerId) => {
   const url = `https://api-web.nhle.com/v1/player/${playerId}/landing`;
   const response = await fetch(url);
 
@@ -105,10 +109,13 @@ const fetchPlayerHeadshot = async (playerId) => {
 
   const data = await response.json();
   // Assuming the headshot URL is in data.headshot.url
-  if (data && data.headshot) {
-    return data.headshot;
+  if (data && data.headshot && data.currentTeamAbbrev) {
+    return {
+      headshot: data.headshot,
+      currentTeamAbbrev: data.currentTeamAbbrev,
+    };
   } else {
-    throw new Error("Headshot not found in the data.");
+    throw new Error("Headshot or currentTeamAbbrev not found in the data.");
   }
 };
 
