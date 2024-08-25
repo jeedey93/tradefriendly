@@ -123,8 +123,11 @@ function Rumors() {
     setFilteredRumors(filtered);
   };
 
-  const handleAvatarClick = (teamLinks) => {
-    setCurrentTeamLinks(teamLinks);
+  const handleAvatarClick = (team) => {
+    const teamLinks = team.links;
+    setCurrentTeamLinks([
+      { teamName: teamNameMap[team.teamId], links: teamLinks },
+    ]);
     setOpenDialog(true);
   };
 
@@ -260,23 +263,35 @@ function Rumors() {
                     </Typography>
                     <Box sx={{ mt: 2 }}>
                       {rumor.rumoredTeams.map((team) => (
-                        <IconButton
+                        <Box
                           key={team.teamId}
-                          onClick={() =>
-                            handleAvatarClick(
-                              rumor.rumoredTeams.map((t) => ({
-                                teamName: teamNameMap[t.teamId],
-                                link: t.teamLink,
-                              }))
-                            )
-                          }
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            mb: 1,
+                          }}
                         >
-                          <Avatar
-                            src={getTeamLogo(team.teamId)}
-                            alt={teamNameMap[team.teamId]}
-                            sx={{ width: 56, height: 56 }}
-                          />
-                        </IconButton>
+                          <IconButton
+                            onClick={() => handleAvatarClick(team)}
+                            sx={{ p: 0, mr: 1 }}
+                          >
+                            <Avatar
+                              src={getTeamLogo(team.teamId)}
+                              alt={teamNameMap[team.teamId]}
+                              sx={{ width: 40, height: 40 }}
+                            />
+                          </IconButton>
+                          <Typography
+                            variant="body2"
+                            sx={{
+                              fontWeight: "bold",
+                              color: "text.primary",
+                              fontSize: "1rem",
+                            }}
+                          >
+                            {team.chance}%
+                          </Typography>
+                        </Box>
                       ))}
                     </Box>
                   </CardContent>
@@ -286,7 +301,13 @@ function Rumors() {
           ))}
         </Grid>
 
-        <Dialog open={openDialog} onClose={handleCloseDialog}>
+        <Dialog
+          open={openDialog}
+          onClose={handleCloseDialog}
+          maxWidth="md"
+          fullWidth
+          sx={{ minWidth: "500px" }}
+        >
           <DialogTitle>
             Team Links
             <IconButton
@@ -301,22 +322,27 @@ function Rumors() {
           </DialogTitle>
           <DialogContent>
             <List>
-              {currentTeamLinks.map((teamLink) => (
-                <ListItem
-                  button
-                  component="a"
-                  href={convertToAbsoluteUrl(teamLink.link)}
-                  key={teamLink.teamName}
-                >
-                  <ListItemIcon>
-                    <Avatar
-                      src={getTeamLogoFromTeamAbbrev(teamLink.teamName)}
-                      alt={teamLink.teamName}
-                    />
-                  </ListItemIcon>
-                  <ListItemText primary={teamLink.teamName} />
-                </ListItem>
-              ))}
+              {currentTeamLinks.map((team, teamIndex) =>
+                team.links.map((link, index) => (
+                  <React.Fragment key={`${teamIndex}-${index}`}>
+                    <ListItem
+                      button
+                      component="a"
+                      href={convertToAbsoluteUrl(link.url)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <ListItemIcon>
+                        <LinkIcon />
+                      </ListItemIcon>
+                      <ListItemText
+                        primary={`${link.title} - Link ${index + 1}`}
+                      />
+                    </ListItem>
+                    {index < team.links.length - 1 && <Divider />}
+                  </React.Fragment>
+                ))
+              )}
             </List>
           </DialogContent>
         </Dialog>
