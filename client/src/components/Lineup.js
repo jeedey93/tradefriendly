@@ -8,14 +8,29 @@ const Lineup = ({ lineup, onDragEnd }) => {
 
   const handlePlayerClick = (player, index, section, sectionIndex) => {
     if (selectedPlayer) {
-      const newLineup = { ...lineup };
-      const temp = newLineup[section][sectionIndex]?.players[index];
-      if (temp) {
-        newLineup[section][sectionIndex].players[index] = selectedPlayer;
-        newLineup[selectedPlayer.section][selectedPlayer.sectionIndex].players[
-          selectedPlayerIndex
-        ] = temp;
+      if (section === "goalies" && selectedPlayer.section === "goalies") {
+        // Swap starter and backup goalies
+        const newLineup = { ...lineup };
+        const currentStarter = newLineup.goalies.starter;
+        const currentBackup = newLineup.goalies.backup;
 
+        if (
+          sectionIndex === "starter" &&
+          selectedPlayer.sectionIndex === "backup"
+        ) {
+          // Swapping starter and backup
+          newLineup.goalies.starter = currentBackup;
+          newLineup.goalies.backup = currentStarter;
+        } else if (
+          sectionIndex === "backup" &&
+          selectedPlayer.sectionIndex === "starter"
+        ) {
+          // Swapping backup and starter
+          newLineup.goalies.backup = currentStarter;
+          newLineup.goalies.starter = currentBackup;
+        }
+
+        // Trigger the drag end event with the new lineup
         onDragEnd(
           {
             source: {
@@ -26,10 +41,36 @@ const Lineup = ({ lineup, onDragEnd }) => {
           },
           newLineup
         );
+
+        // Clear the selected player state
         setSelectedPlayer(null);
         setSelectedPlayerIndex(null);
+      } else {
+        // Handle other player swaps normally
+        const newLineup = { ...lineup };
+        const temp = newLineup[section][sectionIndex]?.players[index];
+        if (temp) {
+          newLineup[section][sectionIndex].players[index] = selectedPlayer;
+          newLineup[selectedPlayer.section][
+            selectedPlayer.sectionIndex
+          ].players[selectedPlayerIndex] = temp;
+
+          onDragEnd(
+            {
+              source: {
+                index: selectedPlayerIndex,
+                droppableId: selectedPlayer.section,
+              },
+              destination: { index, droppableId: section },
+            },
+            newLineup
+          );
+          setSelectedPlayer(null);
+          setSelectedPlayerIndex(null);
+        }
       }
     } else {
+      // Store selected player details
       setSelectedPlayer({ ...player, section, sectionIndex });
       setSelectedPlayerIndex(index);
     }
