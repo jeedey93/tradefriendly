@@ -42,25 +42,25 @@ function TeamPage() {
       {
         title: "2nd Line",
         players: [
-          { id: "player4", name: "Player One" },
-          { id: "player5", name: "Player Two" },
-          { id: "player6", name: "Player Three" },
+          { id: "player4", name: "Player 4" },
+          { id: "player5", name: "Player 5" },
+          { id: "player6", name: "Player 6" },
         ],
       },
       {
         title: "3rd Line",
         players: [
-          { id: "player7", name: "Player One" },
-          { id: "player8", name: "Player Two" },
-          { id: "player9", name: "Player Three" },
+          { id: "player7", name: "Player 7" },
+          { id: "player8", name: "Player 8" },
+          { id: "player9", name: "Player 9" },
         ],
       },
       {
         title: "4th Line",
         players: [
-          { id: "player10", name: "Player One" },
-          { id: "player11", name: "Player Two" },
-          { id: "player12", name: "Player Three" },
+          { id: "player10", name: "Player 10" },
+          { id: "player11", name: "Player 11" },
+          { id: "player12", name: "Player 12" },
         ],
       },
     ],
@@ -68,28 +68,32 @@ function TeamPage() {
       {
         title: "1st Pair",
         players: [
-          { id: "player1", name: "Player One" },
-          { id: "player2", name: "Player Two" },
+          { id: "def1", name: "Def1" },
+          { id: "def2", name: "Def2" },
         ],
       },
       {
         title: "2nd Pair",
         players: [
-          { id: "player1", name: "Player One" },
-          { id: "player2", name: "Player Two" },
+          { id: "def3", name: "Def3" },
+          { id: "def4", name: "Def4" },
         ],
       },
       {
         title: "3rd Pair",
         players: [
-          { id: "player1", name: "Player One" },
-          { id: "player2", name: "Player Two" },
+          { id: "def5", name: "Def5" },
+          { id: "def6", name: "Def6" },
         ],
       },
     ],
-    goalies: [
-      { title: "1st Goalie", players: [{ id: "goalie1", name: "Goalie One" }] },
-      { title: "2nd Goalie", players: [{ id: "goalie2", name: "Goalie Two" }] },
+    goalies: {
+      first: { id: "goalie1", name: "Goalie One" },
+      second: { id: "goalie2", name: "Goalie Two" },
+    },
+    reserves: [
+      { id: "reserve1", name: "Reserve Player 1" },
+      { id: "reserve2", name: "Reserve Player 2" },
     ],
   });
   const [contracts, setContracts] = useState([]);

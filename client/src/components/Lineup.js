@@ -187,7 +187,7 @@ const Lineup = ({ lineup, onDragEnd }) => {
         )}
 
         {/* Goalies */}
-        {lineup.goalies && lineup.goalies.length > 0 && (
+        {lineup.goalies && (
           <Droppable droppableId="goalies" direction="vertical">
             {(provided) => (
               <Box
@@ -208,53 +208,127 @@ const Lineup = ({ lineup, onDragEnd }) => {
                   Goalies
                 </Typography>
                 <Divider sx={{ mb: 2 }} />
-                <Droppable droppableId="goalies-line" direction="horizontal">
-                  {(provided) => (
-                    <Box
-                      ref={provided.innerRef}
-                      {...provided.droppableProps}
-                      sx={{
-                        display: "flex",
-                        flexDirection: "row",
-                        gap: 1,
-                        p: 1,
-                        borderRadius: 2,
-                        backgroundColor: "#fff",
-                        boxShadow: 1,
-                      }}
-                    >
-                      {lineup.goalies.map((player, playerIndex) => (
-                        <Draggable
-                          key={player.id}
-                          draggableId={player.id}
-                          index={playerIndex}
-                        >
-                          {(provided) => (
-                            <Paper
-                              ref={provided.innerRef}
-                              {...provided.draggableProps}
-                              {...provided.dragHandleProps}
-                              sx={{
-                                p: 2,
-                                mb: 1,
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                borderRadius: 1,
-                                backgroundColor: "#fff",
-                                boxShadow: 2,
-                                cursor: "grab",
-                              }}
-                            >
-                              {player.name}
-                            </Paper>
-                          )}
-                        </Draggable>
-                      ))}
-                      {provided.placeholder}
-                    </Box>
-                  )}
-                </Droppable>
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "row",
+                    gap: 1,
+                    mb: 2,
+                    p: 1,
+                    borderRadius: 2,
+                    backgroundColor: "#fff",
+                    boxShadow: 1,
+                  }}
+                >
+                  <Draggable
+                    key={lineup.goalies.first.id}
+                    draggableId={lineup.goalies.first.id}
+                    index={0}
+                  >
+                    {(provided) => (
+                      <Paper
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        {...provided.dragHandleProps}
+                        sx={{
+                          p: 2,
+                          mb: 1,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          borderRadius: 1,
+                          backgroundColor: "#fff",
+                          boxShadow: 2,
+                          cursor: "grab",
+                        }}
+                      >
+                        {lineup.goalies.first.name}
+                      </Paper>
+                    )}
+                  </Draggable>
+                  <Draggable
+                    key={lineup.goalies.second.id}
+                    draggableId={lineup.goalies.second.id}
+                    index={1}
+                  >
+                    {(provided) => (
+                      <Paper
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        {...provided.dragHandleProps}
+                        sx={{
+                          p: 2,
+                          mb: 1,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          borderRadius: 1,
+                          backgroundColor: "#fff",
+                          boxShadow: 2,
+                          cursor: "grab",
+                        }}
+                      >
+                        {lineup.goalies.second.name}
+                      </Paper>
+                    )}
+                  </Draggable>
+                </Box>
+                {provided.placeholder}
+              </Box>
+            )}
+          </Droppable>
+        )}
+
+        {/* Reserves */}
+        {lineup.reserves && (
+          <Droppable droppableId="reserves" direction="vertical">
+            {(provided) => (
+              <Box
+                ref={provided.innerRef}
+                {...provided.droppableProps}
+                sx={{
+                  border: "1px solid lightgray",
+                  borderRadius: 2,
+                  p: 2,
+                  backgroundColor: "#f9f9f9",
+                }}
+              >
+                <Typography
+                  variant="h5"
+                  gutterBottom
+                  sx={{ fontWeight: "bold" }}
+                >
+                  Reserves
+                </Typography>
+                <Divider sx={{ mb: 2 }} />
+                {lineup.reserves.map((player, playerIndex) => (
+                  <Draggable
+                    key={player.id}
+                    draggableId={player.id}
+                    index={playerIndex}
+                  >
+                    {(provided) => (
+                      <Paper
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        {...provided.dragHandleProps}
+                        sx={{
+                          p: 2,
+                          mb: 1,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          borderRadius: 1,
+                          backgroundColor: "#fff",
+                          boxShadow: 2,
+                          cursor: "grab",
+                        }}
+                      >
+                        {player.name}
+                      </Paper>
+                    )}
+                  </Draggable>
+                ))}
                 {provided.placeholder}
               </Box>
             )}
