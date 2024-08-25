@@ -1,6 +1,6 @@
 import React from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
-import { Paper, Typography, Box, Divider } from "@mui/material";
+import { Paper, Typography, Box, Divider, Tooltip } from "@mui/material";
 
 const Lineup = ({ lineup, onDragEnd }) => {
   return (
@@ -23,7 +23,7 @@ const Lineup = ({ lineup, onDragEnd }) => {
                 <Typography
                   variant="h5"
                   gutterBottom
-                  sx={{ fontWeight: "bold" }}
+                  sx={{ fontWeight: "bold", mb: 2 }}
                 >
                   Forwards
                 </Typography>
@@ -41,7 +41,7 @@ const Lineup = ({ lineup, onDragEnd }) => {
                         sx={{
                           display: "flex",
                           flexDirection: "row",
-                          gap: 1,
+                          gap: 2,
                           mb: 2,
                           p: 1,
                           borderRadius: 2,
@@ -49,7 +49,15 @@ const Lineup = ({ lineup, onDragEnd }) => {
                           boxShadow: 1,
                         }}
                       >
-                        <Box sx={{ flexShrink: 0, mr: 2 }}>
+                        <Box
+                          sx={{
+                            flexShrink: 0,
+                            mr: 2,
+                            p: 1,
+                            backgroundColor: "#e3f2fd",
+                            borderRadius: 1,
+                          }}
+                        >
                           <Typography variant="h6" sx={{ fontWeight: "bold" }}>
                             {line.title}
                           </Typography>
@@ -64,36 +72,41 @@ const Lineup = ({ lineup, onDragEnd }) => {
                             index={playerIndex}
                           >
                             {(provided) => (
-                              <Paper
-                                ref={provided.innerRef}
-                                {...provided.draggableProps}
-                                {...provided.dragHandleProps}
-                                sx={{
-                                  p: 2,
-                                  mb: 1,
-                                  display: "flex",
-                                  flexDirection: "column",
-                                  alignItems: "center",
-                                  justifyContent: "center",
-                                  borderRadius: 1,
-                                  backgroundColor: "#fff",
-                                  boxShadow: 2,
-                                  cursor: "grab",
-                                }}
+                              <Tooltip
+                                title={`Position: ${player.position}\nRating: ${player.overallRating}`}
+                                arrow
                               >
-                                <Typography
-                                  variant="body1"
-                                  sx={{ fontWeight: "bold" }}
+                                <Paper
+                                  ref={provided.innerRef}
+                                  {...provided.draggableProps}
+                                  {...provided.dragHandleProps}
+                                  sx={{
+                                    p: 2,
+                                    mb: 1,
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    borderRadius: 1,
+                                    backgroundColor: "#fff",
+                                    boxShadow: 2,
+                                    cursor: "grab",
+                                  }}
                                 >
-                                  {player.name}
-                                </Typography>
-                                <Typography variant="body2">
-                                  {player.position}
-                                </Typography>
-                                <Typography variant="body2">
-                                  Rating: {player.overallRating}
-                                </Typography>
-                              </Paper>
+                                  <Typography
+                                    variant="body1"
+                                    sx={{ fontWeight: "bold" }}
+                                  >
+                                    {player.name}
+                                  </Typography>
+                                  <Typography variant="body2">
+                                    Position: {player.position}
+                                  </Typography>
+                                  <Typography variant="body2">
+                                    Rating: {player.overallRating}
+                                  </Typography>
+                                </Paper>
+                              </Tooltip>
                             )}
                           </Draggable>
                         ))}
@@ -125,7 +138,7 @@ const Lineup = ({ lineup, onDragEnd }) => {
                 <Typography
                   variant="h5"
                   gutterBottom
-                  sx={{ fontWeight: "bold" }}
+                  sx={{ fontWeight: "bold", mb: 2 }}
                 >
                   Defensemen
                 </Typography>
@@ -143,7 +156,7 @@ const Lineup = ({ lineup, onDragEnd }) => {
                         sx={{
                           display: "flex",
                           flexDirection: "row",
-                          gap: 1,
+                          gap: 2,
                           mb: 2,
                           p: 1,
                           borderRadius: 2,
@@ -151,7 +164,15 @@ const Lineup = ({ lineup, onDragEnd }) => {
                           boxShadow: 1,
                         }}
                       >
-                        <Box sx={{ flexShrink: 0, mr: 2 }}>
+                        <Box
+                          sx={{
+                            flexShrink: 0,
+                            mr: 2,
+                            p: 1,
+                            backgroundColor: "#e3f2fd",
+                            borderRadius: 1,
+                          }}
+                        >
                           <Typography variant="h6" sx={{ fontWeight: "bold" }}>
                             {line.title}
                           </Typography>
@@ -166,36 +187,41 @@ const Lineup = ({ lineup, onDragEnd }) => {
                             index={playerIndex}
                           >
                             {(provided) => (
-                              <Paper
-                                ref={provided.innerRef}
-                                {...provided.draggableProps}
-                                {...provided.dragHandleProps}
-                                sx={{
-                                  p: 2,
-                                  mb: 1,
-                                  display: "flex",
-                                  flexDirection: "column",
-                                  alignItems: "center",
-                                  justifyContent: "center",
-                                  borderRadius: 1,
-                                  backgroundColor: "#fff",
-                                  boxShadow: 2,
-                                  cursor: "grab",
-                                }}
+                              <Tooltip
+                                title={`Position: ${player.position}\nRating: ${player.overallRating}`}
+                                arrow
                               >
-                                <Typography
-                                  variant="body1"
-                                  sx={{ fontWeight: "bold" }}
+                                <Paper
+                                  ref={provided.innerRef}
+                                  {...provided.draggableProps}
+                                  {...provided.dragHandleProps}
+                                  sx={{
+                                    p: 2,
+                                    mb: 1,
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    borderRadius: 1,
+                                    backgroundColor: "#fff",
+                                    boxShadow: 2,
+                                    cursor: "grab",
+                                  }}
                                 >
-                                  {player.name}
-                                </Typography>
-                                <Typography variant="body2">
-                                  {player.position}
-                                </Typography>
-                                <Typography variant="body2">
-                                  Rating: {player.overallRating}
-                                </Typography>
-                              </Paper>
+                                  <Typography
+                                    variant="body1"
+                                    sx={{ fontWeight: "bold" }}
+                                  >
+                                    {player.name}
+                                  </Typography>
+                                  <Typography variant="body2">
+                                    Position: {player.position}
+                                  </Typography>
+                                  <Typography variant="body2">
+                                    Rating: {player.overallRating}
+                                  </Typography>
+                                </Paper>
+                              </Tooltip>
                             )}
                           </Draggable>
                         ))}
@@ -227,7 +253,7 @@ const Lineup = ({ lineup, onDragEnd }) => {
                 <Typography
                   variant="h5"
                   gutterBottom
-                  sx={{ fontWeight: "bold" }}
+                  sx={{ fontWeight: "bold", mb: 2 }}
                 >
                   Goalies
                 </Typography>
@@ -236,7 +262,7 @@ const Lineup = ({ lineup, onDragEnd }) => {
                   sx={{
                     display: "flex",
                     flexDirection: "row",
-                    gap: 1,
+                    gap: 2,
                     mb: 2,
                     p: 1,
                     borderRadius: 2,
@@ -244,76 +270,53 @@ const Lineup = ({ lineup, onDragEnd }) => {
                     boxShadow: 1,
                   }}
                 >
-                  <Draggable
-                    key={lineup.goalies.first.id}
-                    draggableId={lineup.goalies.first.id}
-                    index={0}
-                  >
-                    {(provided) => (
-                      <Paper
-                        ref={provided.innerRef}
-                        {...provided.draggableProps}
-                        {...provided.dragHandleProps}
-                        sx={{
-                          p: 2,
-                          mb: 1,
-                          display: "flex",
-                          flexDirection: "column",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          borderRadius: 1,
-                          backgroundColor: "#fff",
-                          boxShadow: 2,
-                          cursor: "grab",
-                        }}
+                  {[lineup.goalies.first, lineup.goalies.second].map(
+                    (goalie, index) => (
+                      <Draggable
+                        key={goalie.id}
+                        draggableId={goalie.id}
+                        index={index}
                       >
-                        <Typography variant="body1" sx={{ fontWeight: "bold" }}>
-                          {lineup.goalies.first.name}
-                        </Typography>
-                        <Typography variant="body2">
-                          {lineup.goalies.first.position}
-                        </Typography>
-                        <Typography variant="body2">
-                          Rating: {lineup.goalies.first.overallRating}
-                        </Typography>
-                      </Paper>
-                    )}
-                  </Draggable>
-                  <Draggable
-                    key={lineup.goalies.second.id}
-                    draggableId={lineup.goalies.second.id}
-                    index={1}
-                  >
-                    {(provided) => (
-                      <Paper
-                        ref={provided.innerRef}
-                        {...provided.draggableProps}
-                        {...provided.dragHandleProps}
-                        sx={{
-                          p: 2,
-                          mb: 1,
-                          display: "flex",
-                          flexDirection: "column",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          borderRadius: 1,
-                          backgroundColor: "#fff",
-                          boxShadow: 2,
-                          cursor: "grab",
-                        }}
-                      >
-                        <Typography variant="body1" sx={{ fontWeight: "bold" }}>
-                          {lineup.goalies.second.name}
-                        </Typography>
-                        <Typography variant="body2">
-                          {lineup.goalies.second.position}
-                        </Typography>
-                        <Typography variant="body2">
-                          Rating: {lineup.goalies.second.overallRating}
-                        </Typography>
-                      </Paper>
-                    )}
-                  </Draggable>
+                        {(provided) => (
+                          <Tooltip
+                            title={`Position: ${goalie.position}\nRating: ${goalie.overallRating}`}
+                            arrow
+                          >
+                            <Paper
+                              ref={provided.innerRef}
+                              {...provided.draggableProps}
+                              {...provided.dragHandleProps}
+                              sx={{
+                                p: 2,
+                                mb: 1,
+                                display: "flex",
+                                flexDirection: "column",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                borderRadius: 1,
+                                backgroundColor: "#fff",
+                                boxShadow: 2,
+                                cursor: "grab",
+                              }}
+                            >
+                              <Typography
+                                variant="body1"
+                                sx={{ fontWeight: "bold" }}
+                              >
+                                {goalie.name}
+                              </Typography>
+                              <Typography variant="body2">
+                                Position: {goalie.position}
+                              </Typography>
+                              <Typography variant="body2">
+                                Rating: {goalie.overallRating}
+                              </Typography>
+                            </Paper>
+                          </Tooltip>
+                        )}
+                      </Draggable>
+                    )
+                  )}
                 </Box>
                 {provided.placeholder}
               </Box>
@@ -338,7 +341,7 @@ const Lineup = ({ lineup, onDragEnd }) => {
                 <Typography
                   variant="h5"
                   gutterBottom
-                  sx={{ fontWeight: "bold" }}
+                  sx={{ fontWeight: "bold", mb: 2 }}
                 >
                   Reserves
                 </Typography>
@@ -347,7 +350,7 @@ const Lineup = ({ lineup, onDragEnd }) => {
                   sx={{
                     display: "flex",
                     flexDirection: "row",
-                    gap: 1,
+                    gap: 2,
                     mb: 2,
                     p: 1,
                     borderRadius: 2,
@@ -355,48 +358,53 @@ const Lineup = ({ lineup, onDragEnd }) => {
                     boxShadow: 1,
                   }}
                 >
-                  {lineup.reserves.map((player, index) => (
+                  {lineup.reserves.map((reserve, index) => (
                     <Draggable
-                      key={player.id}
-                      draggableId={player.id}
+                      key={reserve.id}
+                      draggableId={reserve.id}
                       index={index}
                     >
                       {(provided) => (
-                        <Paper
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                          {...provided.dragHandleProps}
-                          sx={{
-                            p: 2,
-                            mb: 1,
-                            display: "flex",
-                            flexDirection: "column",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            borderRadius: 1,
-                            backgroundColor: "#fff",
-                            boxShadow: 2,
-                            cursor: "grab",
-                          }}
+                        <Tooltip
+                          title={`Position: ${reserve.position}\nRating: ${reserve.overallRating}`}
+                          arrow
                         >
-                          <Typography
-                            variant="body1"
-                            sx={{ fontWeight: "bold" }}
+                          <Paper
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            {...provided.dragHandleProps}
+                            sx={{
+                              p: 2,
+                              mb: 1,
+                              display: "flex",
+                              flexDirection: "column",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              borderRadius: 1,
+                              backgroundColor: "#fff",
+                              boxShadow: 2,
+                              cursor: "grab",
+                            }}
                           >
-                            {player.name}
-                          </Typography>
-                          <Typography variant="body2">
-                            {player.position}
-                          </Typography>
-                          <Typography variant="body2">
-                            Rating: {player.overallRating}
-                          </Typography>
-                        </Paper>
+                            <Typography
+                              variant="body1"
+                              sx={{ fontWeight: "bold" }}
+                            >
+                              {reserve.name}
+                            </Typography>
+                            <Typography variant="body2">
+                              Position: {reserve.position}
+                            </Typography>
+                            <Typography variant="body2">
+                              Rating: {reserve.overallRating}
+                            </Typography>
+                          </Paper>
+                        </Tooltip>
                       )}
                     </Draggable>
                   ))}
-                  {provided.placeholder}
                 </Box>
+                {provided.placeholder}
               </Box>
             )}
           </Droppable>
