@@ -10,7 +10,6 @@ import {
   CssBaseline,
   Avatar,
   CardActionArea,
-  IconButton,
   Tooltip,
   Dialog,
   DialogTitle,
@@ -18,8 +17,14 @@ import {
   List,
   ListItem,
   ListItemText,
+  ListItemIcon,
+  IconButton,
+  Divider,
 } from "@mui/material";
-import FilterBar from "../components/FilterBar"; // Import the FilterBar component
+
+import { Link as LinkIcon, Info as InfoIcon } from "@mui/icons-material";
+import CloseIcon from "@mui/icons-material/Close";
+import FilterBar from "../components/FilterBar";
 
 function Rumors() {
   const [initialRumors, setRumors] = useState([]);
@@ -28,27 +33,28 @@ function Rumors() {
   const [error, setError] = useState(null);
 
   const [teamsData, setTeamsData] = useState([]);
-  const [teamNameMap, setTeamNameMap] = useState({}); // Map for teamId to team name
+  const [teamNameMap, setTeamNameMap] = useState({});
 
   useEffect(() => {
-    // Fetch teams data
     fetch("/api/teams")
       .then((response) => response.json())
       .then((data) => {
         data.sort((a, b) => a.city.localeCompare(b.city));
         setTeamsData(data);
-        // Create a map of teamId to team name
         const map = data.reduce((acc, team) => {
           acc[team._id] = team.name;
           return acc;
         }, {});
         setTeamNameMap(map);
       })
-      .catch((error) => console.error("Error fetching teams data:", error));
+      .catch((error) => {
+        console.error("Error fetching teams data:", error);
+        setError("Error fetching teams data.");
+        setLoading(false);
+      });
   }, []);
 
   useEffect(() => {
-    // Fetch rumors data
     fetch(`/api/rumors`)
       .then((response) => {
         if (!response.ok) {
@@ -58,16 +64,16 @@ function Rumors() {
       })
       .then((data) => {
         setRumors(data);
-        setFilteredRumors(data); // Initialize filteredRumors with the fetched data
+        setFilteredRumors(data);
         setLoading(false);
       })
       .catch((error) => {
-        setError("Error fetching rumors data: " + error.message);
+        console.error("Error fetching rumors data:", error);
+        setError("Error fetching rumors data.");
         setLoading(false);
       });
   }, []);
 
-  // Extract unique values for trade reasons and teams
   const tradeReasons = Array.from(
     new Set(initialRumors.map((r) => r.tradeReason))
   );
@@ -85,13 +91,11 @@ function Rumors() {
   }, [selectedTradeReason, selectedTeam]);
 
   const handleTradeReasonChange = (event) => {
-    const reason = event.target.value;
-    setSelectedTradeReason(reason);
+    setSelectedTradeReason(event.target.value);
   };
 
   const handleTeamChange = (event) => {
-    const team = event.target.value;
-    setSelectedTeam(team);
+    setSelectedTeam(event.target.value);
   };
 
   const filterRumors = (tradeReason, team) => {
@@ -125,12 +129,10 @@ function Rumors() {
   };
 
   const convertToAbsoluteUrl = (url) => {
-    // Check if URL is already absolute
     if (/^(?:[a-z]+:)?\/\//i.test(url)) {
       return url;
     }
-    // For relative URLs, just return as is
-    return url;
+    return new URL(url, window.location.origin).href;
   };
 
   if (loading) {
@@ -211,10 +213,7 @@ function Rumors() {
                             key={team.teamId}
                             sx={{ display: "flex", alignItems: "center" }}
                           >
-                            <Tooltip
-                              title={`Chance: ${team.chance}%`} // Display chance in tooltip
-                              arrow
-                            >
+                            <Tooltip title={`Chance: ${team.chance}%`} arrow>
                               <IconButton
                                 onClick={() => handleAvatarClick(team.links)}
                                 sx={{ mr: 1 }}
@@ -249,21 +248,45 @@ function Rumors() {
         onClose={handleCloseDialog}
         maxWidth="sm"
         fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: 2,
+            boxShadow: 3,
+          },
+        }}
       >
-        <DialogTitle>Team Links</DialogTitle>
+        <DialogTitle sx={{ display: "flex", alignItems: "center" }}>
+          <InfoIcon sx={{ mr: 1 }} />
+          <Typography variant="h6">Sources</Typography>
+          <IconButton
+            edge="end"
+            color="inherit"
+            onClick={handleCloseDialog}
+            sx={{ ml: "auto" }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <Divider />
         <DialogContent>
           <List>
             {currentTeamLinks.map((link, index) => (
-              <ListItem key={index}>
+              <ListItem key={index} sx={{ padding: 1 }}>
+                <ListItemIcon>
+                  <LinkIcon />
+                </ListItemIcon>
                 <ListItemText
                   primary={
-                    <a
-                      href={convertToAbsoluteUrl(link)}
+                    <Typography
+                      component="a"
+                      href={convertToAbsoluteUrl(link.url)}
                       target="_blank"
                       rel="noopener noreferrer"
+                      variant="body1"
+                      sx={{ textDecoration: "none", color: "primary.main" }}
                     >
-                      {link}
-                    </a>
+                      {link.title}
+                    </Typography>
                   }
                 />
               </ListItem>
