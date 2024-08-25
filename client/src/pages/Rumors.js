@@ -10,7 +10,6 @@ import {
   CssBaseline,
   Avatar,
   CardActionArea,
-  Tooltip,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -21,7 +20,6 @@ import {
   IconButton,
   Divider,
 } from "@mui/material";
-
 import { Link as LinkIcon, Info as InfoIcon } from "@mui/icons-material";
 import CloseIcon from "@mui/icons-material/Close";
 import FilterBar from "../components/FilterBar";
@@ -31,9 +29,12 @@ function Rumors() {
   const [filteredRumors, setFilteredRumors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
   const [teamsData, setTeamsData] = useState([]);
   const [teamNameMap, setTeamNameMap] = useState({});
+  const [selectedTradeReason, setSelectedTradeReason] = useState("");
+  const [selectedTeam, setSelectedTeam] = useState("");
+  const [openDialog, setOpenDialog] = useState(false);
+  const [currentTeamLinks, setCurrentTeamLinks] = useState([]);
 
   useEffect(() => {
     fetch("/api/teams")
@@ -80,11 +81,6 @@ function Rumors() {
   const teams = Array.from(
     new Set(initialRumors.flatMap((r) => r.rumoredTeams.map((t) => t.teamId)))
   ).map((teamId) => teamNameMap[teamId]);
-
-  const [selectedTradeReason, setSelectedTradeReason] = useState("");
-  const [selectedTeam, setSelectedTeam] = useState("");
-  const [openDialog, setOpenDialog] = useState(false);
-  const [currentTeamLinks, setCurrentTeamLinks] = useState([]);
 
   useEffect(() => {
     filterRumors(selectedTradeReason, selectedTeam);
@@ -202,8 +198,31 @@ function Rumors() {
                     <Typography gutterBottom variant="h5" component="div">
                       {rumor.playerName}
                     </Typography>
-                    <Typography variant="body2" color="text.secondary">
+                    <Typography
+                      variant="body1"
+                      sx={{
+                        fontWeight: "bold",
+                        color: "#aa2e25",
+                        bgcolor: "background.default",
+                        padding: 1,
+                        borderRadius: 1,
+                        mb: 2,
+                      }}
+                    >
                       Trade Reason: {rumor.tradeReason}
+                    </Typography>
+                    <Typography
+                      variant="body1"
+                      sx={{
+                        fontWeight: "bold",
+                        color: "#357a38",
+                        bgcolor: "background.default",
+                        padding: 1,
+                        borderRadius: 1,
+                        mb: 2,
+                      }}
+                    >
+                      Trade Value: {rumor.tradeValue}
                     </Typography>
                     <Box sx={{ mt: 2 }}>
                       <Typography variant="h6">Rumored Teams</Typography>
@@ -213,23 +232,18 @@ function Rumors() {
                             key={team.teamId}
                             sx={{ display: "flex", alignItems: "center" }}
                           >
-                            <Tooltip title={`Chance: ${team.chance}%`} arrow>
-                              <IconButton
-                                onClick={() => handleAvatarClick(team.links)}
-                                sx={{ mr: 1 }}
-                              >
-                                <Avatar
-                                  src={getTeamLogo(team.teamId)}
-                                  sx={{
-                                    width: 56,
-                                    height: 56,
-                                    objectFit: "cover",
-                                  }}
-                                />
-                              </IconButton>
-                            </Tooltip>
-                            <Typography variant="body2">
-                              {teamNameMap[team.teamId]}
+                            <Avatar
+                              src={getTeamLogo(team.teamId)}
+                              sx={{
+                                width: 56,
+                                height: 56,
+                                objectFit: "cover",
+                                mr: 1,
+                              }}
+                              onClick={() => handleAvatarClick(team.links)}
+                            />
+                            <Typography variant="body2" sx={{ mr: 1 }}>
+                              {teamNameMap[team.teamId]} - {team.chance}%
                             </Typography>
                           </Box>
                         ))}
