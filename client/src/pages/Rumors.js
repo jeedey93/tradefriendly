@@ -12,10 +12,6 @@ import {
   CardActionArea,
   IconButton,
   Tooltip,
-  MenuItem,
-  Select,
-  InputLabel,
-  FormControl,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -23,6 +19,7 @@ import {
   ListItem,
   ListItemText,
 } from "@mui/material";
+import FilterBar from "../components/FilterBar"; // Import the FilterBar component
 
 function Rumors() {
   const [initialRumors, setRumors] = useState([]);
@@ -172,46 +169,14 @@ function Rumors() {
           Trade Rumors
         </Typography>
 
-        <Box sx={{ mb: 4 }}>
-          <Grid container spacing={2}>
-            <Grid item xs={12} sm={6} md={4}>
-              <FormControl fullWidth>
-                <InputLabel id="trade-reason-label">Trade Reason</InputLabel>
-                <Select
-                  labelId="trade-reason-label"
-                  value={selectedTradeReason}
-                  onChange={handleTradeReasonChange}
-                  label="Trade Reason"
-                >
-                  <MenuItem value="">All Trade Reasons</MenuItem>
-                  {tradeReasons.map((reason) => (
-                    <MenuItem key={reason} value={reason}>
-                      {reason}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={12} sm={6} md={4}>
-              <FormControl fullWidth>
-                <InputLabel id="team-label">Rumored Teams</InputLabel>
-                <Select
-                  labelId="team-label"
-                  value={selectedTeam}
-                  onChange={handleTeamChange}
-                  label="Rumored Teams"
-                >
-                  <MenuItem value="">All Teams</MenuItem>
-                  {teams.map((team) => (
-                    <MenuItem key={team} value={team}>
-                      {team}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
-          </Grid>
-        </Box>
+        <FilterBar
+          tradeReasons={tradeReasons}
+          teams={teams}
+          selectedTradeReason={selectedTradeReason}
+          selectedTeam={selectedTeam}
+          onTradeReasonChange={handleTradeReasonChange}
+          onTeamChange={handleTeamChange}
+        />
 
         <Grid container spacing={4}>
           {filteredRumors.map((rumor) => (
@@ -264,8 +229,8 @@ function Rumors() {
                                 />
                               </IconButton>
                             </Tooltip>
-                            <Typography variant="body2" color="text.secondary">
-                              {team.chance}%
+                            <Typography variant="body2">
+                              {teamNameMap[team.teamId]}
                             </Typography>
                           </Box>
                         ))}
@@ -277,32 +242,35 @@ function Rumors() {
             </Grid>
           ))}
         </Grid>
-
-        {/* Dialog for showing team rumors links */}
-        <Dialog
-          open={openDialog}
-          onClose={handleCloseDialog}
-          maxWidth="md"
-          fullWidth
-        >
-          <DialogTitle>Team Rumors</DialogTitle>
-          <DialogContent>
-            <List>
-              {currentTeamLinks.map((link) => (
-                <ListItem
-                  button
-                  component="a"
-                  href={convertToAbsoluteUrl(link.url)} // Use the converted URL
-                  target="_blank"
-                  key={link.url}
-                >
-                  <ListItemText primary={link.title} />
-                </ListItem>
-              ))}
-            </List>
-          </DialogContent>
-        </Dialog>
       </Container>
+
+      <Dialog
+        open={openDialog}
+        onClose={handleCloseDialog}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle>Team Links</DialogTitle>
+        <DialogContent>
+          <List>
+            {currentTeamLinks.map((link, index) => (
+              <ListItem key={index}>
+                <ListItemText
+                  primary={
+                    <a
+                      href={convertToAbsoluteUrl(link)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {link}
+                    </a>
+                  }
+                />
+              </ListItem>
+            ))}
+          </List>
+        </DialogContent>
+      </Dialog>
     </Box>
   );
 }
