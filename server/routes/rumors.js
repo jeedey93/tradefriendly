@@ -1,13 +1,15 @@
 import express from "express";
 import mongoose from "mongoose";
+import fetch from "node-fetch";
 import Rumor from "../models/Rumor.js";
+import Player from "../models/Player.js";
 
 const router = express.Router();
 
 // POST route to create a new rumor
 router.post("/rumors", async (req, res) => {
   try {
-    // Validate and process req.body
+    // Destructure request body
     let { playerName, playerImage, tradeReason, rumoredTeams } = req.body;
 
     // Check if all required fields are present
@@ -22,11 +24,23 @@ router.post("/rumors", async (req, res) => {
       }
     }
 
-    if (playerImage === undefined || playerImage.trim() === "") {
+    // Check if the player exists in the Player database
+    const player = await Player.findOne({ name: playerName });
+    if (!player) {
+      return res.status(404).send("Player does not exist.");
+    }
+
+    // Determine player image
+    try {
+      playerImage = await fetchPlayerHeadshot(player.id);
+    } catch (error) {
+      console.warn(
+        `Could not fetch headshot for player ${playerName}: ${error.message}`
+      );
       playerImage = "https://assets.nhle.com/mugs/nhl/default-skater.png";
     }
 
-    // Create a new Rumor document
+    // Create and save the new Rumor document
     const rumor = new Rumor({
       playerName,
       playerImage,
@@ -34,11 +48,10 @@ router.post("/rumors", async (req, res) => {
       rumoredTeams: rumoredTeams.map((team) => ({
         teamId: team.teamId,
         chance: team.chance,
-        links: team.links === undefined ? [] : team.links,
+        links: team.links || [],
       })),
     });
 
-    // Save the rumor to the database
     await rumor.save();
     res.status(201).send(rumor);
   } catch (error) {
@@ -81,5 +94,22 @@ router.get("/rumors", async (req, res) => {
     res.status(500).send(error);
   }
 });
+
+const fetchPlayerHeadshot = async (playerId) => {
+  const url = `https://api-web.nhle.com/v1/player/${playerId}/landing`;
+  const response = await fetch(url);
+
+  if (!response.ok) {
+    throw new Error(`API request failed with status ${response.status}`);
+  }
+
+  const data = await response.json();
+  // Assuming the headshot URL is in data.headshot.url
+  if (data && data.headshot) {
+    return data.headshot;
+  } else {
+    throw new Error("Headshot not found in the data.");
+  }
+};
 
 export default router;
