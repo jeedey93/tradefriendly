@@ -200,16 +200,21 @@ function TeamPage() {
     },
     reserves: [
       {
-        id: "reserve1",
-        name: "Zachary Scott",
-        position: "Forward",
-        overallRating: 74,
-      },
-      {
-        id: "reserve2",
-        name: "Benjamin Walker",
-        position: "Defenseman",
-        overallRating: 72,
+        title: "Reserves",
+        players: [
+          {
+            id: "reserve1",
+            name: "Zachary Scott",
+            position: "Forward",
+            overallRating: 74,
+          },
+          {
+            id: "reserve2",
+            name: "Benjamin Walker",
+            position: "Defenseman",
+            overallRating: 72,
+          },
+        ],
       },
     ],
   });
