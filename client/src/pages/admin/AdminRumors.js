@@ -20,7 +20,6 @@ import {
   Popover,
   Snackbar,
 } from "@mui/material";
-
 import { Delete, Add } from "@mui/icons-material";
 
 const AdminRumor = () => {
@@ -28,7 +27,6 @@ const AdminRumor = () => {
   const [loading, setLoading] = useState(true);
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
-
   const [rumors, setRumors] = useState([]);
   const [anchorEl, setAnchorEl] = useState(null);
   const [newRumor, setNewRumor] = useState({
@@ -61,6 +59,7 @@ const AdminRumor = () => {
   const [teamsData, setTeamsData] = useState([]);
 
   useEffect(() => {
+    // Fetch teams data
     fetch("/api/teams")
       .then((response) => response.json())
       .then((data) => {
@@ -68,6 +67,18 @@ const AdminRumor = () => {
         setTeamsData(data);
       })
       .catch((error) => console.error("Error fetching teams data:", error));
+
+    // Fetch rumors data
+    fetch("/api/rumors")
+      .then((response) => response.json())
+      .then((data) => {
+        setRumors(data);
+        setLoading(false); // Set loading to false once data is fetched
+      })
+      .catch((error) => {
+        setError("Error fetching rumors data: " + error.message);
+        setLoading(false); // Set loading to false even if there's an error
+      });
   }, []);
 
   const handleAddRumorClick = (event) => {
@@ -171,6 +182,11 @@ const AdminRumor = () => {
       [field]: value,
     };
     setNewRumor((prevRumor) => ({ ...prevRumor, rumoredTeams: updatedTeams }));
+  };
+
+  const getTeamName = (teamId) => {
+    const team = teamsData.find((t) => t._id === teamId);
+    return team ? team.city + " " + team.name : "";
   };
 
   const open = Boolean(anchorEl);
@@ -284,13 +300,12 @@ const AdminRumor = () => {
                           e.target.value
                         )
                       }
-                      margin="normal"
                       fullWidth
-                      style={{ marginRight: 8 }}
+                      margin="normal"
                     />
                     <TextField
                       variant="outlined"
-                      label="Link URL"
+                      label="URL"
                       value={link.url}
                       onChange={(e) =>
                         handleLinkChange(
@@ -300,8 +315,8 @@ const AdminRumor = () => {
                           e.target.value
                         )
                       }
-                      margin="normal"
                       fullWidth
+                      margin="normal"
                     />
                   </Box>
                 ))}
@@ -309,7 +324,6 @@ const AdminRumor = () => {
                   variant="contained"
                   color="secondary"
                   onClick={() => handleAddLink(index)}
-                  fullWidth
                 >
                   Add Link
                 </Button>
@@ -319,89 +333,79 @@ const AdminRumor = () => {
               variant="contained"
               color="primary"
               onClick={handleAddRumoredTeam}
-              fullWidth
-              style={{ marginTop: 16 }}
             >
               Add Rumored Team
             </Button>
-            <Box mt={2} display="flex" justifyContent="space-between">
+            <Box mt={2}>
               <Button
                 variant="contained"
                 color="primary"
                 onClick={handleSaveRumor}
               >
-                Save
-              </Button>
-              <Button
-                variant="outlined"
-                color="secondary"
-                onClick={handlePopoverClose}
-              >
-                Cancel
+                Save Rumor
               </Button>
             </Box>
           </Box>
         </Popover>
       </Box>
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell align="center">
-                <b>Player Name</b>
-              </TableCell>
-              <TableCell align="center">
-                <b>Trade Reason</b>
-              </TableCell>
-              <TableCell align="center">
-                <b>Rumored Teams</b>
-              </TableCell>
-              <TableCell align="center">
-                <b>Action</b>
-              </TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {rumors.map((rumor, rumorIndex) => (
-              <TableRow key={rumorIndex}>
-                <TableCell>{rumor.playerName}</TableCell>
-                <TableCell>{rumor.tradeReason}</TableCell>
-                <TableCell>
-                  <ul>
-                    {rumor.rumoredTeams.map((team, teamIndex) => (
-                      <li key={teamIndex}>
-                        {team.teamName} - {team.chance}%
-                        <ul>
-                          {team.links.map((link, linkIndex) => (
-                            <li key={linkIndex}>
-                              <a
-                                href={link.url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                              >
-                                {link.title}
-                              </a>
-                            </li>
-                          ))}
-                        </ul>
-                      </li>
-                    ))}
-                  </ul>
-                </TableCell>
-                <TableCell align="center">
-                  <IconButton
-                    aria-label="delete"
-                    color="secondary"
-                    onClick={() => handleRemoveRumor(rumorIndex)}
-                  >
-                    <Delete />
-                  </IconButton>
-                </TableCell>
+      {loading ? (
+        <Typography>Loading...</Typography>
+      ) : error ? (
+        <Typography color="error">{error}</Typography>
+      ) : (
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Player Name</TableCell>
+                <TableCell>Trade Reason</TableCell>
+                <TableCell>Teams</TableCell>
+                <TableCell>Action</TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+            </TableHead>
+            <TableBody>
+              {rumors.map((rumor, index) => (
+                <TableRow key={index}>
+                  <TableCell>{rumor.playerName}</TableCell>
+                  <TableCell>{rumor.tradeReason}</TableCell>
+                  <TableCell>
+                    {rumor.rumoredTeams.map((team, teamIndex) => (
+                      <div key={teamIndex}>
+                        {getTeamName(team.teamId)} - {team.chance}%
+                        {team.links.map((link, linkIndex) => (
+                          <div key={linkIndex}>
+                            <a
+                              href={link.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              {link.title}
+                            </a>
+                          </div>
+                        ))}
+                      </div>
+                    ))}
+                  </TableCell>
+                  <TableCell>
+                    <IconButton
+                      color="secondary"
+                      onClick={() => handleRemoveRumor(index)}
+                    >
+                      <Delete />
+                    </IconButton>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={6000}
+        onClose={() => setOpenSnackbar(false)}
+        message={snackbarMessage}
+      />
     </Container>
   );
 };

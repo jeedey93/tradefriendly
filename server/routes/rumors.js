@@ -8,10 +8,10 @@ const router = express.Router();
 router.post("/rumors", async (req, res) => {
   try {
     // Validate and process req.body
-    const { playerName, playerImage, tradeReason, rumoredTeams } = req.body;
+    let { playerName, playerImage, tradeReason, rumoredTeams } = req.body;
 
     // Check if all required fields are present
-    if (!playerName || !playerImage || !tradeReason || !rumoredTeams) {
+    if (!playerName || !tradeReason || !rumoredTeams) {
       return res.status(400).send("All fields are required.");
     }
 
@@ -22,15 +22,19 @@ router.post("/rumors", async (req, res) => {
       }
     }
 
+    if (playerImage === undefined || playerImage.trim() === "") {
+      playerImage = "https://assets.nhle.com/mugs/nhl/default-skater.png";
+    }
+
     // Create a new Rumor document
     const rumor = new Rumor({
       playerName,
       playerImage,
       tradeReason,
       rumoredTeams: rumoredTeams.map((team) => ({
-        teamId: team.teamId, // Ensure valid ObjectId
+        teamId: team.teamId,
         chance: team.chance,
-        links: team.links,
+        links: team.links === undefined ? [] : team.links,
       })),
     });
 

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Container,
   Typography,
@@ -8,11 +8,10 @@ import {
   Grid,
   Box,
   CssBaseline,
-  Chip,
   Avatar,
   CardActionArea,
-  CardActions,
-  Button,
+  IconButton,
+  Tooltip,
   MenuItem,
   Select,
   InputLabel,
@@ -23,222 +22,79 @@ import {
   List,
   ListItem,
   ListItemText,
-  IconButton,
-  Tooltip,
 } from "@mui/material";
-import { Info as InfoIcon } from "@mui/icons-material";
 
 function Rumors() {
-  const teamTradeReasons = [
-    "Salary Cap Management",
-    "Performance Issues",
-    "Injuries",
-    "Team Chemistry",
-    "Rebuilding",
-  ];
+  const [initialRumors, setRumors] = useState([]);
+  const [filteredRumors, setFilteredRumors] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const playerTradeReasons = [
-    "Lack of Playing Time",
-    "Contract Dispute",
-    "Desire for a New Challenge",
-    "Personal Reasons",
-    "Team Rebuilding",
-  ];
+  const [teamsData, setTeamsData] = useState([]);
+  const [teamNameMap, setTeamNameMap] = useState({}); // Map for teamId to team name
 
-  // Sample data for rumors
-  const initialRumors = [
-    {
-      id: 1,
-      playerName: "John Doe",
-      playerImage: "https://assets.nhle.com/mugs/nhl/20232024/TBL/8476453.png",
-      tradeReason: "Personal Reasons",
-      rumoredTeams: [
-        {
-          teamId: 1,
-          name: "Toronto Maple Leafs",
-          logo: "https://upload.wikimedia.org/wikipedia/en/thumb/9/9f/Toronto_Maple_Leafs_Logo_2016.svg/1200px-Toronto_Maple_Leafs_Logo_2016.svg.png",
-          chance: 40,
-          links: [
-            {
-              title: "Toronto Rumors 1",
-              url: "https://www.example.com/toronto-rumors-1",
-            },
-            {
-              title: "Toronto Rumors 2",
-              url: "https://www.example.com/toronto-rumors-2",
-            },
-          ],
-        },
-        {
-          teamId: 2,
-          name: "Montreal Canadiens",
-          logo: "https://upload.wikimedia.org/wikipedia/en/thumb/6/69/Montreal_Canadiens.svg/1200px-Montreal_Canadiens.svg.png",
-          chance: 30,
-          links: [
-            {
-              title: "Montreal Rumors 1",
-              url: "https://www.example.com/montreal-rumors-1",
-            },
-            {
-              title: "Montreal Rumors 2",
-              url: "https://www.example.com/montreal-rumors-2",
-            },
-          ],
-        },
-        {
-          teamId: 3,
-          name: "Vancouver Canucks",
-          logo: "https://upload.wikimedia.org/wikipedia/en/thumb/3/3a/Vancouver_Canucks_logo.svg/1200px-Vancouver_Canucks_logo.svg.png",
-          chance: 30,
-          links: [
-            {
-              title: "Vancouver Rumors 1",
-              url: "https://www.example.com/vancouver-rumors-1",
-            },
-            {
-              title: "Vancouver Rumors 2",
-              url: "https://www.example.com/vancouver-rumors-2",
-            },
-          ],
-        },
-      ],
-    },
-    {
-      id: 2,
-      playerName: "Jane Smith",
-      playerImage: "https://assets.nhle.com/mugs/nhl/20232024/COL/8477492.png",
-      tradeReason: "Contract Dispute",
-      rumoredTeams: [
-        {
-          name: "Boston Bruins",
-          logo: "https://upload.wikimedia.org/wikipedia/en/thumb/1/12/Boston_Bruins_logo.svg/1200px-Boston_Bruins_logo.svg.png",
-          chance: 50,
-        },
-        {
-          name: "New York Rangers",
-          logo: "https://upload.wikimedia.org/wikipedia/en/thumb/6/6f/New_York_Rangers.svg/1200px-New_York_Rangers.svg.png",
-          chance: 50,
-        },
-      ],
-    },
-    {
-      id: 3,
-      playerName: "Mike Johnson",
-      playerImage: "https://assets.nhle.com/mugs/nhl/20232024/EDM/8478402.png",
-      tradeReason: "Cap Space",
-      rumoredTeams: [
-        {
-          name: "Chicago Blackhawks",
-          logo: "https://upload.wikimedia.org/wikipedia/en/thumb/2/29/Chicago_Blackhawks_logo.svg/1200px-Chicago_Blackhawks_logo.svg.png",
-          chance: 35,
-        },
-        {
-          name: "Los Angeles Kings",
-          logo: "https://upload.wikimedia.org/wikipedia/en/thumb/6/63/Los_Angeles_Kings_logo.svg/1200px-Los_Angeles_Kings_logo.svg.png",
-          chance: 35,
-        },
-        {
-          name: "Dallas Stars",
-          logo: "https://upload.wikimedia.org/wikipedia/en/thumb/5/52/Dallas_Stars_logo.svg/1200px-Dallas_Stars_logo.svg.png",
-          chance: 30,
-        },
-      ],
-    },
-    {
-      id: 4,
-      playerName: "Artemi Panarin",
-      playerImage: "https://assets.nhle.com/mugs/nhl/20232024/NYR/8478550.png",
-      tradeReason: "Lack of Playing Time",
-      rumoredTeams: [
-        {
-          name: "Chicago Blackhawks",
-          logo: "https://upload.wikimedia.org/wikipedia/en/thumb/2/29/Chicago_Blackhawks_logo.svg/1200px-Chicago_Blackhawks_logo.svg.png",
-          chance: 30,
-        },
-        {
-          name: "Los Angeles Kings",
-          logo: "https://upload.wikimedia.org/wikipedia/en/thumb/6/63/Los_Angeles_Kings_logo.svg/1200px-Los_Angeles_Kings_logo.svg.png",
-          chance: 30,
-        },
-        {
-          name: "Dallas Stars",
-          logo: "https://upload.wikimedia.org/wikipedia/en/thumb/5/52/Dallas_Stars_logo.svg/1200px-Dallas_Stars_logo.svg.png",
-          chance: 40,
-        },
-      ],
-    },
-    {
-      id: 5,
-      playerName: "David Pastrnak",
-      playerImage: "https://assets.nhle.com/mugs/nhl/20232024/BOS/8477956.png",
-      tradeReason: "Team Rebuilding",
-      rumoredTeams: [
-        {
-          name: "Chicago Blackhawks",
-          logo: "https://upload.wikimedia.org/wikipedia/en/thumb/2/29/Chicago_Blackhawks_logo.svg/1200px-Chicago_Blackhawks_logo.svg.png",
-          chance: 30,
-        },
-        {
-          name: "Los Angeles Kings",
-          logo: "https://upload.wikimedia.org/wikipedia/en/thumb/6/63/Los_Angeles_Kings_logo.svg/1200px-Los_Angeles_Kings_logo.svg.png",
-          chance: 30,
-        },
-        {
-          name: "Dallas Stars",
-          logo: "https://upload.wikimedia.org/wikipedia/en/thumb/5/52/Dallas_Stars_logo.svg/1200px-Dallas_Stars_logo.svg.png",
-          chance: 40,
-        },
-      ],
-    },
-    {
-      id: 6,
-      playerName: "Auston Matthews",
-      playerImage: "https://assets.nhle.com/mugs/nhl/20232024/TOR/8479318.png",
-      tradeReason: "Unsatisfied with Playing Time",
-      rumoredTeams: [
-        {
-          name: "Chicago Blackhawks",
-          logo: "https://upload.wikimedia.org/wikipedia/en/thumb/2/29/Chicago_Blackhawks_logo.svg/1200px-Chicago_Blackhawks_logo.svg.png",
-          chance: 30,
-        },
-        {
-          name: "Los Angeles Kings",
-          logo: "https://upload.wikimedia.org/wikipedia/en/thumb/6/63/Los_Angeles_Kings_logo.svg/1200px-Los_Angeles_Kings_logo.svg.png",
-          chance: 30,
-        },
-        {
-          name: "Dallas Stars",
-          logo: "https://upload.wikimedia.org/wikipedia/en/thumb/5/52/Dallas_Stars_logo.svg/1200px-Dallas_Stars_logo.svg.png",
-          chance: 40,
-        },
-      ],
-    },
-  ];
+  useEffect(() => {
+    // Fetch teams data
+    fetch("/api/teams")
+      .then((response) => response.json())
+      .then((data) => {
+        data.sort((a, b) => a.city.localeCompare(b.city));
+        setTeamsData(data);
+        // Create a map of teamId to team name
+        const map = data.reduce((acc, team) => {
+          acc[team._id] = team.name;
+          return acc;
+        }, {});
+        setTeamNameMap(map);
+      })
+      .catch((error) => console.error("Error fetching teams data:", error));
+  }, []);
+
+  useEffect(() => {
+    // Fetch rumors data
+    fetch(`/api/rumors`)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        setRumors(data);
+        setFilteredRumors(data); // Initialize filteredRumors with the fetched data
+        setLoading(false);
+      })
+      .catch((error) => {
+        setError("Error fetching rumors data: " + error.message);
+        setLoading(false);
+      });
+  }, []);
 
   // Extract unique values for trade reasons and teams
   const tradeReasons = Array.from(
     new Set(initialRumors.map((r) => r.tradeReason))
   );
   const teams = Array.from(
-    new Set(initialRumors.flatMap((r) => r.rumoredTeams.map((t) => t.name)))
-  );
+    new Set(initialRumors.flatMap((r) => r.rumoredTeams.map((t) => t.teamId)))
+  ).map((teamId) => teamNameMap[teamId]);
 
-  const [filteredRumors, setFilteredRumors] = useState(initialRumors);
   const [selectedTradeReason, setSelectedTradeReason] = useState("");
   const [selectedTeam, setSelectedTeam] = useState("");
   const [openDialog, setOpenDialog] = useState(false);
   const [currentTeamLinks, setCurrentTeamLinks] = useState([]);
 
+  useEffect(() => {
+    filterRumors(selectedTradeReason, selectedTeam);
+  }, [selectedTradeReason, selectedTeam]);
+
   const handleTradeReasonChange = (event) => {
     const reason = event.target.value;
     setSelectedTradeReason(reason);
-    filterRumors(reason, selectedTeam);
   };
 
   const handleTeamChange = (event) => {
     const team = event.target.value;
     setSelectedTeam(team);
-    filterRumors(selectedTradeReason, team);
   };
 
   const filterRumors = (tradeReason, team) => {
@@ -250,7 +106,7 @@ function Rumors() {
 
     if (team) {
       filtered = filtered.filter((r) =>
-        r.rumoredTeams.some((t) => t.name === team)
+        r.rumoredTeams.some((t) => teamNameMap[t.teamId] === team)
       );
     }
 
@@ -265,6 +121,32 @@ function Rumors() {
   const handleCloseDialog = () => {
     setOpenDialog(false);
   };
+
+  const getTeamLogo = (teamId) => {
+    const team = teamsData.find((t) => t._id === teamId);
+    return team ? team.logo : "";
+  };
+
+  const convertToAbsoluteUrl = (url) => {
+    // Check if URL is already absolute
+    if (/^(?:[a-z]+:)?\/\//i.test(url)) {
+      return url;
+    }
+    // For relative URLs, just return as is
+    return url;
+  };
+
+  if (loading) {
+    return <Typography align="center">Loading...</Typography>;
+  }
+
+  if (error) {
+    return (
+      <Typography align="center" color="error">
+        {error}
+      </Typography>
+    );
+  }
 
   return (
     <Box
@@ -358,20 +240,36 @@ function Rumors() {
                     </Typography>
                     <Box sx={{ mt: 2 }}>
                       <Typography variant="h6">Rumored Teams</Typography>
-                      {rumor.rumoredTeams.map((team) => (
-                        <Tooltip
-                          key={team.name}
-                          title="Click to view rumors"
-                          arrow
-                        >
-                          <IconButton
-                            onClick={() => handleAvatarClick(team.links)}
-                            sx={{ mr: 1, mb: 1 }}
+                      <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
+                        {rumor.rumoredTeams.map((team) => (
+                          <Box
+                            key={team.teamId}
+                            sx={{ display: "flex", alignItems: "center" }}
                           >
-                            <Avatar src={team.logo} />
-                          </IconButton>
-                        </Tooltip>
-                      ))}
+                            <Tooltip
+                              title={`Chance: ${team.chance}%`} // Display chance in tooltip
+                              arrow
+                            >
+                              <IconButton
+                                onClick={() => handleAvatarClick(team.links)}
+                                sx={{ mr: 1 }}
+                              >
+                                <Avatar
+                                  src={getTeamLogo(team.teamId)}
+                                  sx={{
+                                    width: 56,
+                                    height: 56,
+                                    objectFit: "cover",
+                                  }}
+                                />
+                              </IconButton>
+                            </Tooltip>
+                            <Typography variant="body2" color="text.secondary">
+                              {team.chance}%
+                            </Typography>
+                          </Box>
+                        ))}
+                      </Box>
                     </Box>
                   </CardContent>
                 </CardActionArea>
@@ -394,7 +292,7 @@ function Rumors() {
                 <ListItem
                   button
                   component="a"
-                  href={link.url}
+                  href={convertToAbsoluteUrl(link.url)} // Use the converted URL
                   target="_blank"
                   key={link.url}
                 >
