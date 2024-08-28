@@ -43,4 +43,30 @@ router.get("/teams/:abbreviation", async (req, res) => {
   }
 });
 
+router.get("/teams/:abbreviation/lineup", async (req, res) => {
+  res.status(200).send({ message: "Lineup for " + req.params });
+});
+
+router.post("/teams/:abbreviation/lineup", async (req, res) => {
+  try {
+    console.log(req.body);
+    const user = new Team(req.body);
+    await user.save();
+    res.status(201).send(user);
+  } catch (error) {
+    res.status(400).send(error);
+  }
+});
+
+router.post("/teams", async (req, res) => {
+  try {
+    console.log(req.body);
+    const user = new Team(req.body);
+    await user.save();
+    res.status(201).send(user);
+  } catch (error) {
+    res.status(400).send(error);
+  }
+});
+
 export default router;

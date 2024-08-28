@@ -503,9 +503,6 @@ const Lineup = ({ lineup, onDragEnd }) => {
                         <Typography variant="h6" gutterBottom>
                           {line.title}
                         </Typography>
-                        <Typography variant="body2" color="textSecondary">
-                          Chemistry: {line.chemistry || "N/A"}
-                        </Typography>
                       </Box>
                       {line.players?.map((player, playerIndex) => (
                         <Draggable
