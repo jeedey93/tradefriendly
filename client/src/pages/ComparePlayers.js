@@ -4,16 +4,62 @@ import {
   Box,
   TextField,
   Button,
-  Paper,
   Grid,
   Avatar,
   Card,
   CardContent,
   CardMedia,
   CardHeader,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableRow,
+  Paper,
   IconButton,
+  Divider,
 } from "@mui/material";
 import { Search } from "@mui/icons-material";
+import { styled } from "@mui/material/styles";
+
+const StyledCard = styled(Card)(({ theme }) => ({
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  margin: theme.spacing(2),
+  maxWidth: 345,
+}));
+
+const StyledTable = styled(Table)(({ theme }) => ({
+  minWidth: 650,
+  "& th, td": {
+    padding: theme.spacing(1),
+  },
+}));
+
+const StatCell = styled(TableCell)(({ theme }) => ({
+  textAlign: "center",
+  padding: theme.spacing(1),
+}));
+
+const HighlightCell = styled(StatCell)(({ isWinner }) => ({
+  fontWeight: isWinner ? "bold" : "normal",
+  color: isWinner ? "green" : "inherit",
+  backgroundColor: isWinner ? "#e8f5e9" : "inherit", // Light green background for winner
+  border: isWinner ? "2px solid green" : "1px solid #ddd",
+}));
+
+const PlayerContainer = styled(Box)(({ theme }) => ({
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "space-between",
+  marginBottom: theme.spacing(4),
+}));
+
+const StatsContainer = styled(Box)(({ theme }) => ({
+  flexGrow: 1,
+  marginLeft: theme.spacing(2),
+}));
 
 function ComparePlayers() {
   const [player1, setPlayer1] = useState(null);
@@ -27,6 +73,7 @@ function ComparePlayers() {
       .then((response) => response.json())
       .then((data) => {
         setPlayer(data);
+        setError(null); // Clear previous errors
       })
       .catch((error) => {
         setError("Error fetching player data: " + error.message);
@@ -46,15 +93,17 @@ function ComparePlayers() {
   };
 
   const renderPlayerCard = (player) => (
-    <Card>
+    <StyledCard elevation={3}>
       <CardHeader
         avatar={<Avatar alt={player.firstName} src={player.headshot} />}
         title={`${player.firstName} ${player.lastName}`}
         subheader={`#${player.sweaterNumber} - ${player.position}`}
         action={
-          <IconButton>
-            <img src={player.teamLogo} alt={player.fullTeamName} width={50} />
-          </IconButton>
+          <Avatar
+            alt={player.fullTeamName}
+            src={player.teamLogo}
+            sx={{ width: 50, height: 50 }}
+          />
         }
       />
       <CardMedia
@@ -67,7 +116,9 @@ function ComparePlayers() {
         }}
       />
       <CardContent>
-        <Typography variant="h6">{player.fullTeamName}</Typography>
+        <Typography variant="h6" align="center">
+          {player.fullTeamName}
+        </Typography>
         <Typography variant="body2">
           Height: {player.heightInInches} in / {player.heightInCentimeters} cm
         </Typography>
@@ -85,8 +136,71 @@ function ComparePlayers() {
           (Overall {player.draftDetails.overallPick})
         </Typography>
       </CardContent>
-    </Card>
+    </StyledCard>
   );
+
+  const renderStatsComparison = (player1Stats, player2Stats) => {
+    return Object.entries(player1Stats).map(([statName, statValue1]) => {
+      const statValue2 = player2Stats[statName];
+      const isPlayer1Winner = statValue1 > statValue2;
+      const isPlayer2Winner = statValue2 > statValue1;
+
+      return (
+        <TableRow key={statName}>
+          <HighlightCell isWinner={isPlayer1Winner}>{statValue1}</HighlightCell>
+          <StatCell>{statName}</StatCell>
+          <HighlightCell isWinner={isPlayer2Winner}>{statValue2}</HighlightCell>
+        </TableRow>
+      );
+    });
+  };
+
+  const getStats = (player) => {
+    if (!player) return {};
+    return {
+      "Games Played (Regular Season)":
+        player.featuredStats.regularSeason.subSeason.gamesPlayed,
+      "Goals (Regular Season)":
+        player.featuredStats.regularSeason.subSeason.goals,
+      "Assists (Regular Season)":
+        player.featuredStats.regularSeason.subSeason.assists,
+      "Points (Regular Season)":
+        player.featuredStats.regularSeason.subSeason.points,
+      "+- (Regular Season)":
+        player.featuredStats.regularSeason.subSeason.plusMinus,
+      "PIM (Regular Season)": player.featuredStats.regularSeason.subSeason.pim,
+      "Power Play Goals (Regular Season)":
+        player.featuredStats.regularSeason.subSeason.powerPlayGoals,
+      "Power Play Points (Regular Season)":
+        player.featuredStats.regularSeason.subSeason.powerPlayPoints,
+      "Game-Winning Goals (Regular Season)":
+        player.featuredStats.regularSeason.subSeason.gameWinningGoals,
+      "Shots (Regular Season)":
+        player.featuredStats.regularSeason.subSeason.shots,
+      "Shooting % (Regular Season)":
+        (
+          player.featuredStats.regularSeason.subSeason.shootingPctg * 100
+        ).toFixed(2) + "%",
+      "Games Played (Playoffs)":
+        player.featuredStats.playoffs.subSeason.gamesPlayed,
+      "Goals (Playoffs)": player.featuredStats.playoffs.subSeason.goals,
+      "Assists (Playoffs)": player.featuredStats.playoffs.subSeason.assists,
+      "Points (Playoffs)": player.featuredStats.playoffs.subSeason.points,
+      "+- (Playoffs)": player.featuredStats.playoffs.subSeason.plusMinus,
+      "PIM (Playoffs)": player.featuredStats.playoffs.subSeason.pim,
+      "Power Play Goals (Playoffs)":
+        player.featuredStats.playoffs.subSeason.powerPlayGoals,
+      "Power Play Points (Playoffs)":
+        player.featuredStats.playoffs.subSeason.powerPlayPoints,
+      "Game-Winning Goals (Playoffs)":
+        player.featuredStats.playoffs.subSeason.gameWinningGoals,
+      "Shots (Playoffs)": player.featuredStats.playoffs.subSeason.shots,
+      "Shooting % (Playoffs)":
+        (player.featuredStats.playoffs.subSeason.shootingPctg * 100).toFixed(
+          2
+        ) + "%",
+    };
+  };
 
   return (
     <Box padding={2}>
@@ -138,7 +252,7 @@ function ComparePlayers() {
         </Grid>
       </Grid>
 
-      {/* Display player information */}
+      {/* Display error message */}
       {error && (
         <Typography
           color="error"
@@ -150,18 +264,26 @@ function ComparePlayers() {
         </Typography>
       )}
 
-      <Grid container spacing={3} style={{ marginTop: 24 }}>
-        {player1 && (
-          <Grid item xs={12} md={6}>
-            {renderPlayerCard(player1)}
+      <Box marginTop={4}>
+        <Grid container spacing={3} justifyContent="center">
+          <Grid item xs={12} sm={6}>
+            {player1 && renderPlayerCard(player1)}
           </Grid>
-        )}
-        {player2 && (
-          <Grid item xs={12} md={6}>
-            {renderPlayerCard(player2)}
+          <Grid item xs={12} sm={6}>
+            {player2 && renderPlayerCard(player2)}
           </Grid>
+        </Grid>
+
+        {player1 && player2 && (
+          <TableContainer component={Paper} style={{ marginTop: 24 }}>
+            <StyledTable>
+              <TableBody>
+                {renderStatsComparison(getStats(player1), getStats(player2))}
+              </TableBody>
+            </StyledTable>
+          </TableContainer>
         )}
-      </Grid>
+      </Box>
     </Box>
   );
 }
