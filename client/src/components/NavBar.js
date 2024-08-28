@@ -134,6 +134,16 @@ function NavBar() {
                   </ListItemIcon>
                   <ListItemText primary="Fantasy Pool" />
                 </MenuItem>
+                <MenuItem
+                  component={Link}
+                  to="/comparePlayers"
+                  onClick={handleToolMenuClose}
+                >
+                  <ListItemIcon>
+                    <SettingsIcon fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText primary="Compare Players" />
+                </MenuItem>
               </Menu>
               <Button color="inherit" onClick={handleAdminMenuClick}>
                 Admin
