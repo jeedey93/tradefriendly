@@ -5,6 +5,7 @@ import Teams from "./pages/Teams";
 import Rumors from "./pages/Rumors";
 import AdminRumors from "./pages/admin/AdminRumors";
 import Players from "./pages/Players";
+import ComparePlayers from "./pages/ComparePlayers";
 import TeamPage from "./pages/TeamPage";
 import PlayerPage from "./pages/PlayerPage";
 import TradeSimulator from "./pages/TradeSimulator";
@@ -46,6 +47,7 @@ function App() {
             <Route path="/tradeSimulator" element={<TradeSimulator />} />
             <Route path="/fantasyPool" element={<FantasyPool />} />
             <Route path="/draftTracker" element={<DraftTracker />} />
+            <Route path="/comparePlayers" element={<ComparePlayers />} />
             <Route path="/players" element={<Players />} />
             {/* Dynamic routes */}
             <Route path="/teams/:teamCode" element={<TeamPage />} />{" "}
