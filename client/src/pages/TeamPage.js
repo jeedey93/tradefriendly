@@ -22,7 +22,7 @@ import {
 
 function TeamPage() {
   const { teamCode } = useParams();
-  const [players, setPlayers] = useState([]);
+  const [currentRoster, setCurrentRoster] = useState([]);
   const [prospects, setProspects] = useState([]);
   const [error, setError] = useState(null);
   const [rating, setRating] = useState(50);
@@ -31,6 +31,10 @@ function TeamPage() {
   const [strengths, setStrengths] = useState([]);
   const [weaknesses, setWeaknesses] = useState([]);
   const [tradeblock, setTradeblock] = useState([]);
+  const [contracts, setContracts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [tabIndex, setTabIndex] = useState(0);
+
   const [lineup, setLineup] = useState({
     forwards: [
       {
@@ -221,17 +225,31 @@ function TeamPage() {
     ],
   });
 
-  const [contracts, setContracts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [tabIndex, setTabIndex] = useState(0);
-
   useEffect(() => {
+    // Fetch the full roster
     fetch(`/nhl/roster/${teamCode}`)
       .then((response) => response.json())
-      .then((data) => {
-        setPlayers(data);
-        setRating(data.rating || 75);
-        setLoading(false);
+      .then((rosterData) => {
+        // Fetch the prospects
+        fetch(`/nhl/roster/${teamCode}/prospects`)
+          .then((response) => response.json())
+          .then((prospectsData) => {
+            // Filter out prospects from the full roster
+            const prospectIds = prospectsData.map((prospect) => prospect.id);
+            const filteredRoster = rosterData.filter(
+              (player) => !prospectIds.includes(player.id)
+            );
+
+            // Set the current roster (minus prospects) and other states
+            setCurrentRoster(filteredRoster);
+            setProspects(prospectsData);
+            setRating(filteredRoster.rating || 75);
+            setLoading(false);
+          })
+          .catch((error) => {
+            setError("Error fetching prospects data: " + error.message);
+            setLoading(false);
+          });
       })
       .catch((error) => {
         setError("Error fetching roster data: " + error.message);
@@ -253,20 +271,7 @@ function TeamPage() {
         setContracts(data.contracts || []);
       })
       .catch((error) => setError("Error fetching team data: " + error.message));
-  }, [teamCode]);
-
-  useEffect(() => {
-    fetch(`/nhl/roster/${teamCode}/prospects`)
-      .then((response) => response.json())
-      .then((data) => {
-        setProspects(data);
-        setLoading(false);
-      })
-      .catch((error) => {
-        setError("Error fetching prospects data: " + error.message);
-        setLoading(false);
-      });
-  }, [prospects]);
+  }, []);
 
   const handleTabChange = (event, newValue) => {
     setTabIndex(newValue);
@@ -402,6 +407,14 @@ function TeamPage() {
               />
             </Paper>
           </Box>
+
+          {/* Display the PlayerTable for players */}
+          <Box sx={{ my: 4 }}>
+            <Typography variant="h6" gutterBottom>
+              Current Roster
+            </Typography>
+            <PlayerTable players={currentRoster} />
+          </Box>
         </>
       )}
 
@@ -464,7 +477,16 @@ function TeamPage() {
         </Box>
       )}
 
-      {tabIndex === 4 && <PlayerTable players={prospects} />}
+      {tabIndex === 4 && (
+        <>
+          <Box sx={{ my: 4 }}>
+            <Typography variant="h6" gutterBottom>
+              Prospects
+            </Typography>
+            <PlayerTable players={prospects} />
+          </Box>
+        </>
+      )}
 
       {tabIndex === 5 && (
         <Box sx={{ my: 4 }}>
@@ -537,8 +559,6 @@ function TeamPage() {
           </Grid>
         </Box>
       )}
-
-      {tabIndex === 0 && <PlayerTable players={players} />}
     </Container>
   );
 }
