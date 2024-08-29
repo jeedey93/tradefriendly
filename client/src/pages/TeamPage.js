@@ -35,227 +35,34 @@ function TeamPage() {
   const [loading, setLoading] = useState(true);
   const [tabIndex, setTabIndex] = useState(0);
 
-  const [lineup, setLineup] = useState({
-    forwards: [
-      {
-        title: "1st Line",
-        chemistry: 85,
-        players: [
-          {
-            id: "player1",
-            name: "Alex Johnson",
-            position: "Left Wing",
-            overallRating: 85,
-          },
-          {
-            id: "player2",
-            name: "Ryan Smith",
-            position: "Center",
-            overallRating: 88,
-          },
-          {
-            id: "player3",
-            name: "Dylan Carter",
-            position: "Right Wing",
-            overallRating: 87,
-          },
-        ],
-      },
-      {
-        title: "2nd Line",
-        chemistry: 80,
-        players: [
-          {
-            id: "player4",
-            name: "Jordan Lee",
-            position: "Left Wing",
-            overallRating: 83,
-          },
-          {
-            id: "player5",
-            name: "Mason Davis",
-            position: "Center",
-            overallRating: 84,
-          },
-          {
-            id: "player6",
-            name: "Ethan Brown",
-            position: "Right Wing",
-            overallRating: 82,
-          },
-        ],
-      },
-      {
-        title: "3rd Line",
-        chemistry: 100,
-        players: [
-          {
-            id: "player7",
-            name: "Liam Martinez",
-            position: "Left Wing",
-            overallRating: 80,
-          },
-          {
-            id: "player8",
-            name: "Noah Wilson",
-            position: "Center",
-            overallRating: 81,
-          },
-          {
-            id: "player9",
-            name: "Logan Anderson",
-            position: "Right Wing",
-            overallRating: 79,
-          },
-        ],
-      },
-      {
-        title: "4th Line",
-        chemistry: 85,
-        players: [
-          {
-            id: "player10",
-            name: "Jack Thomas",
-            position: "Left Wing",
-            overallRating: 76,
-          },
-          {
-            id: "player11",
-            name: "Owen White",
-            position: "Center",
-            overallRating: 77,
-          },
-          {
-            id: "player12",
-            name: "Lucas Robinson",
-            position: "Right Wing",
-            overallRating: 75,
-          },
-        ],
-      },
-    ],
-    defensemen: [
-      {
-        title: "1st Pair",
-        chemistry: 100,
-        players: [
-          {
-            id: "def1",
-            name: "Mikhail Ivanov",
-            position: "Defenseman",
-            overallRating: 89,
-          },
-          {
-            id: "def2",
-            name: "Tyler Brooks",
-            position: "Defenseman",
-            overallRating: 87,
-          },
-        ],
-      },
-      {
-        title: "2nd Pair",
-        chemistry: 85,
-        players: [
-          {
-            id: "def3",
-            name: "William Harris",
-            position: "Defenseman",
-            overallRating: 84,
-          },
-          {
-            id: "def4",
-            name: "James Thompson",
-            position: "Defenseman",
-            overallRating: 83,
-          },
-        ],
-      },
-      {
-        title: "3rd Pair",
-        chemistry: 50,
-        players: [
-          {
-            id: "def5",
-            name: "Alexander Lewis",
-            position: "Defenseman",
-            overallRating: 80,
-          },
-          {
-            id: "def6",
-            name: "Evan Young",
-            position: "Defenseman",
-            overallRating: 78,
-          },
-        ],
-      },
-    ],
-    goalies: {
-      starter: {
-        id: "goalie1",
-        name: "Nathaniel Green",
-        position: "Goaltender",
-        overallRating: 90,
-      },
-      backup: {
-        id: "goalie2",
-        name: "Connor Adams",
-        position: "Goaltender",
-        overallRating: 88,
-      },
-    },
-    reserves: [
-      {
-        title: "Reserves",
-        players: [
-          {
-            id: "reserve1",
-            name: "Zachary Scott",
-            position: "Forward",
-            overallRating: 74,
-          },
-          {
-            id: "reserve2",
-            name: "Benjamin Walker",
-            position: "Defenseman",
-            overallRating: 72,
-          },
-        ],
-      },
-    ],
-  });
+  const [lineup, setLineup] = useState({});
 
   useEffect(() => {
-    // Fetch the full roster
     fetch(`/nhl/roster/${teamCode}`)
       .then((response) => response.json())
       .then((rosterData) => {
-        // Fetch the prospects
-        fetch(`/nhl/roster/${teamCode}/prospects`)
-          .then((response) => response.json())
-          .then((prospectsData) => {
-            // Filter out prospects from the full roster
-            const prospectIds = prospectsData.map((prospect) => prospect.id);
-            const filteredRoster = rosterData.filter(
-              (player) => !prospectIds.includes(player.id)
-            );
-
-            // Set the current roster (minus prospects) and other states
-            setCurrentRoster(filteredRoster);
-            setProspects(prospectsData);
-            setRating(filteredRoster.rating || 75);
-            setLoading(false);
-          })
-          .catch((error) => {
-            setError("Error fetching prospects data: " + error.message);
-            setLoading(false);
-          });
+        setCurrentRoster(rosterData);
+        setRating(rosterData.rating || 75);
+        setLoading(false);
       })
       .catch((error) => {
         setError("Error fetching roster data: " + error.message);
         setLoading(false);
       });
-  }, [teamCode]);
+  }, []);
+
+  useEffect(() => {
+    fetch(`/nhl/roster/${teamCode}/prospects`)
+      .then((response) => response.json())
+      .then((data) => {
+        setProspects(data);
+        setLoading(false);
+      })
+      .catch((error) => {
+        setError("Error fetching prospects data: " + error.message);
+        setLoading(false);
+      });
+  }, []);
 
   useEffect(() => {
     fetch(`/api/teams/${teamCode}`)
@@ -266,11 +73,26 @@ function TeamPage() {
         setStrengths(data.strengths || []);
         setWeaknesses(data.weaknesses || []);
         setTradeblock(data.tradeblock || []);
-        console.log(lineup);
         setLineup(data.lineup || lineup);
         setContracts(data.contracts || []);
       })
-      .catch((error) => setError("Error fetching team data: " + error.message));
+      .catch((error) => {
+        setError("Error fetching team data: " + error.message);
+        setLoading(false);
+      });
+  }, []);
+
+  useEffect(() => {
+    fetch(`/api/teams/${teamCode}/lineup`)
+      .then((response) => response.json())
+      .then((lineup) => {
+        setLineup(lineup);
+        setLoading(false);
+      })
+      .catch((error) => {
+        setError("Error fetching lineup data: " + error.message);
+        setLoading(false);
+      });
   }, []);
 
   const handleTabChange = (event, newValue) => {
@@ -411,7 +233,7 @@ function TeamPage() {
       {tabIndex === 2 && (
         <Box sx={{ my: 4 }}>
           <Typography variant="h6" gutterBottom>
-            Lineup Compatibility
+            Lineup
           </Typography>
           <Lineup lineup={lineup} onDragEnd={onDragEnd} />
         </Box>

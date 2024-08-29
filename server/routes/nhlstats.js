@@ -1,6 +1,7 @@
 import express from "express";
 import fetch from "node-fetch";
 import Player from "../models/Player.js";
+import getRosterData from "../util/rosterutil.js";
 
 const router = express.Router();
 
@@ -50,28 +51,11 @@ router.get("/players/:id", async (req, res) => {
 });
 
 router.get("/roster/:teamCode", async (req, res) => {
-  const { teamCode } = req.params; // Extract the teamCode from the route parameter
-
+  const { teamCode } = req.params;
   try {
-    const url = `https://api-web.nhle.com/v1/roster/${teamCode}/current`;
-
-    // Make a GET request to an external API
-    const response = await fetch(url);
-
-    // Parse the JSON response
-    const data = await response.json();
-
-    // Use the reusable function to extract data for each player group
-    const forwardsData = extractPlayerData(data.forwards);
-    const defensemenData = extractPlayerData(data.defensemen);
-    const goaliesData = extractPlayerData(data.goalies);
-
-    const rosterData = forwardsData.concat(defensemenData).concat(goaliesData);
-
-    // Send the data back to the client
-    res.json(rosterData);
+    const currentRoster = await getRosterData(teamCode);
+    res.json(currentRoster);
   } catch (error) {
-    // Handle errors
     console.error(error);
     res.status(500).send("An error occurred while retrieving data.");
   }
