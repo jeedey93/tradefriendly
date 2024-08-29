@@ -17,11 +17,13 @@ import {
   ListItemText,
   Tabs,
   Tab,
+  Avatar,
 } from "@mui/material";
 
 function TeamPage() {
   const { teamCode } = useParams();
   const [players, setPlayers] = useState([]);
+  const [prospects, setProspects] = useState([]);
   const [error, setError] = useState(null);
   const [rating, setRating] = useState(50);
   const [teamImage, setTeamImage] = useState();
@@ -253,6 +255,19 @@ function TeamPage() {
       .catch((error) => setError("Error fetching team data: " + error.message));
   }, [teamCode]);
 
+  useEffect(() => {
+    fetch(`/nhl/roster/${teamCode}/prospects`)
+      .then((response) => response.json())
+      .then((data) => {
+        setProspects(data);
+        setLoading(false);
+      })
+      .catch((error) => {
+        setError("Error fetching prospects data: " + error.message);
+        setLoading(false);
+      });
+  }, [prospects]);
+
   const handleTabChange = (event, newValue) => {
     setTabIndex(newValue);
   };
@@ -289,6 +304,12 @@ function TeamPage() {
     console.log("Updated Lineup:", updatedLineup);
   };
 
+  const [draftPicks, setDraftPicks] = useState({
+    2025: [false, true, false, true, true, true, true], // 1st and 3rd picks are not available
+    2026: [true, false, true, true, false, true, true], // 2nd and 5th picks are not available
+    2027: [true, true, true, true, true, true, true], // All picks are available
+  });
+
   if (loading) {
     return (
       <Container
@@ -318,7 +339,9 @@ function TeamPage() {
           <Tab label="Strengths & Weaknesses" />
           <Tab label="Tradeblock" />
           <Tab label="Lineup" />
+          <Tab label="Prospects" />
           <Tab label="Contracts" />
+          <Tab label="Draft Picks" />
         </Tabs>
       </Box>
 
@@ -441,7 +464,9 @@ function TeamPage() {
         </Box>
       )}
 
-      {tabIndex === 4 && (
+      {tabIndex === 4 && <PlayerTable players={prospects} />}
+
+      {tabIndex === 5 && (
         <Box sx={{ my: 4 }}>
           <Typography variant="h6" gutterBottom>
             Contracts
@@ -455,6 +480,61 @@ function TeamPage() {
               ))}
             </List>
           </Paper>
+        </Box>
+      )}
+
+      {tabIndex === 6 && (
+        <Box sx={{ my: 4 }}>
+          <Typography variant="h4" gutterBottom>
+            Draft Picks
+          </Typography>
+          <Grid container spacing={4}>
+            {Object.entries(draftPicks).map(([year, rounds]) => (
+              <Grid item xs={12} key={year}>
+                <Paper
+                  sx={{
+                    p: 3,
+                    borderRadius: 2,
+                    boxShadow: 3,
+                    backgroundColor: "background.paper",
+                  }}
+                >
+                  <Typography variant="h5" gutterBottom>
+                    {year} Draft Picks
+                  </Typography>
+                  <Grid container spacing={2}>
+                    {rounds.map((hasPick, index) => (
+                      <Grid item key={index} sx={{ textAlign: "center" }}>
+                        <Typography
+                          variant="h6"
+                          sx={{
+                            mb: 1, // margin-bottom: 1 (theme spacing)
+                            color: hasPick ? "text.primary" : "text.secondary",
+                          }}
+                        >
+                          Round {index + 1}
+                        </Typography>
+                        <Avatar
+                          sx={{
+                            bgcolor: hasPick ? "primary.main" : "grey.400",
+                            width: 64,
+                            height: 64,
+                            border: `2px solid ${
+                              hasPick ? "primary.dark" : "grey.500"
+                            }`,
+                            "& img": {
+                              objectFit: "contain",
+                            },
+                          }}
+                          src={hasPick ? teamImage : null}
+                        />
+                      </Grid>
+                    ))}
+                  </Grid>
+                </Paper>
+              </Grid>
+            ))}
+          </Grid>
         </Box>
       )}
 

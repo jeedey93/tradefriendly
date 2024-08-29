@@ -77,6 +77,36 @@ router.get("/roster/:teamCode", async (req, res) => {
   }
 });
 
+router.get("/roster/:teamCode/prospects", async (req, res) => {
+  const { teamCode } = req.params; // Extract the teamCode from the route parameter
+
+  try {
+    const url = `https://api-web.nhle.com/v1/prospects/${teamCode}`;
+
+    // Make a GET request to an external API
+    const response = await fetch(url);
+
+    // Parse the JSON response
+    const data = await response.json();
+
+    // Use the reusable function to extract data for each player group
+    const forwardsData = extractPlayerData(data.forwards);
+    const defensemenData = extractPlayerData(data.defensemen);
+    const goaliesData = extractPlayerData(data.goalies);
+
+    const prospectsData = forwardsData
+      .concat(defensemenData)
+      .concat(goaliesData);
+
+    // Send the data back to the client
+    res.json(prospectsData);
+  } catch (error) {
+    // Handle errors
+    console.error(error);
+    res.status(500).send("An error occurred while retrieving data.");
+  }
+});
+
 async function fetchPlayerDataFromDatabase() {
   try {
     const players = await Player.find();
