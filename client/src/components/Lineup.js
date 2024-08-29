@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
-import { Paper, Box, Typography, Card, CardContent } from "@mui/material";
+import { Box, Typography, Card, CardContent } from "@mui/material";
 
 const Lineup = ({ lineup, onDragEnd }) => {
   const [selectedPlayer, setSelectedPlayer] = useState(null);

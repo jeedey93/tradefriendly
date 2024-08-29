@@ -16,8 +16,6 @@ import {
   TableContainer,
   TableRow,
   Paper,
-  IconButton,
-  Divider,
 } from "@mui/material";
 import { Search } from "@mui/icons-material";
 import { styled } from "@mui/material/styles";
@@ -47,18 +45,6 @@ const HighlightCell = styled(StatCell)(({ isWinner }) => ({
   color: isWinner ? "green" : "inherit",
   backgroundColor: isWinner ? "#e8f5e9" : "inherit", // Light green background for winner
   border: isWinner ? "2px solid green" : "1px solid #ddd",
-}));
-
-const PlayerContainer = styled(Box)(({ theme }) => ({
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "space-between",
-  marginBottom: theme.spacing(4),
-}));
-
-const StatsContainer = styled(Box)(({ theme }) => ({
-  flexGrow: 1,
-  marginLeft: theme.spacing(2),
 }));
 
 function ComparePlayers() {

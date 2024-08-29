@@ -1,28 +1,15 @@
 import React, { useEffect, useState } from "react";
 import {
-  Container,
   Typography,
   Card,
   CardContent,
   CardMedia,
   Grid,
   Box,
-  CssBaseline,
   Avatar,
   CardActionArea,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  List,
-  ListItem,
-  ListItemText,
-  ListItemIcon,
   IconButton,
-  Divider,
 } from "@mui/material";
-import { Link as LinkIcon, Info as InfoIcon } from "@mui/icons-material";
-import CloseIcon from "@mui/icons-material/Close";
-import FilterBar from "../components/FilterBar";
 
 function TradeBlock({ tradeblock, teamImage }) {
   const [teamsData, setTeamsData] = useState([]);
@@ -50,7 +37,6 @@ function TradeBlock({ tradeblock, teamImage }) {
   }, []);
 
   const getTeamLogo = (teamId) => {
-    console.log(teamId);
     const team = teamsData.find((t) => t._id === teamId);
     return team ? team.logo : "";
   };
