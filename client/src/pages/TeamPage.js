@@ -334,17 +334,46 @@ function TeamPage() {
 
   return (
     <Container maxWidth="lg" sx={{ mt: 4 }}>
-      <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+      <Grid container spacing={2} alignItems="center">
+        {/* Team Name */}
+        <Grid item xs={12} md={8}>
+          <Typography
+            variant="h3"
+            component="h1"
+            gutterBottom
+            sx={{ fontWeight: 600 }}
+          >
+            {teamName}
+          </Typography>
+        </Grid>
+
+        {/* Team Image */}
+        <Grid item xs={12} md={4} container justifyContent="flex-end">
+          {teamImage && (
+            <Card elevation={4} sx={{ maxWidth: 200 }}>
+              <CardMedia
+                component="img"
+                image={teamImage}
+                alt={`Image of ${teamCode}`}
+                sx={{ width: "100%", height: "auto", objectFit: "contain" }}
+              />
+            </Card>
+          )}
+        </Grid>
+      </Grid>
+
+      {/* Tabs */}
+      <Box sx={{ borderBottom: 1, borderColor: "divider", mt: 2 }}>
         <Tabs
           value={tabIndex}
           onChange={handleTabChange}
           aria-label="team pages"
         >
-          <Tab label="Overview" />
-          <Tab label="Strengths & Weaknesses" />
-          <Tab label="Tradeblock" />
-          <Tab label="Lineup" />
+          <Tab label="Current Roster" />
           <Tab label="Prospects" />
+          <Tab label="Lineup" />
+          <Tab label="Strengths & Weaknesses" />
+          <Tab label="Trade Block" />
           <Tab label="Contracts" />
           <Tab label="Draft Picks" />
         </Tabs>
@@ -352,61 +381,11 @@ function TeamPage() {
 
       {tabIndex === 0 && (
         <>
-          <Grid container spacing={3}>
-            <Grid item xs={12} md={8}>
-              <Box sx={{ display: "flex", alignItems: "center" }}>
-                <Typography
-                  variant="h3"
-                  component="h1"
-                  gutterBottom
-                  sx={{ flexGrow: 1 }}
-                >
-                  {teamName}
-                </Typography>
-              </Box>
-            </Grid>
-            <Grid item xs={12} md={4} container justifyContent="flex-end">
-              {teamImage && (
-                <Card elevation={4}>
-                  <CardMedia
-                    component="img"
-                    image={teamImage}
-                    alt={`Image of ${teamCode}`}
-                    sx={{ width: 200, height: 150, objectFit: "contain" }}
-                  />
-                </Card>
-              )}
-            </Grid>
-          </Grid>
-
           {error && (
             <Typography color="error" sx={{ mt: 2 }}>
               {error}
             </Typography>
           )}
-
-          <Box sx={{ my: 4 }}>
-            <Typography variant="h6" gutterBottom>
-              Team Rating
-            </Typography>
-            <Paper
-              sx={{
-                p: 2,
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-              }}
-            >
-              <Typography variant="h5" gutterBottom>
-                {rating}%
-              </Typography>
-              <LinearProgress
-                variant="determinate"
-                value={rating}
-                sx={{ width: "100%", height: 10, borderRadius: 5 }}
-              />
-            </Paper>
-          </Box>
 
           {/* Display the PlayerTable for players */}
           <Box sx={{ my: 4 }}>
@@ -419,39 +398,96 @@ function TeamPage() {
       )}
 
       {tabIndex === 1 && (
+        <>
+          <Box sx={{ my: 4 }}>
+            <Typography variant="h6" gutterBottom>
+              Prospects
+            </Typography>
+            <PlayerTable players={prospects} />
+          </Box>
+        </>
+      )}
+
+      {tabIndex === 2 && (
+        <Box sx={{ my: 4 }}>
+          <Typography variant="h6" gutterBottom>
+            Lineup Compatibility
+          </Typography>
+          <Lineup lineup={lineup} onDragEnd={onDragEnd} />
+        </Box>
+      )}
+
+      {tabIndex === 3 && (
         <Grid container spacing={3}>
-          <Grid item xs={12} md={6}>
-            <Paper sx={{ p: 2 }}>
+          {/* Team Rating on its own row */}
+          <Grid item xs={12}>
+            <Box sx={{ my: 4 }}>
               <Typography variant="h6" gutterBottom>
-                Strengths
+                Team Rating
               </Typography>
-              <List>
-                {strengths.map((strength, index) => (
-                  <ListItem key={index}>
-                    <ListItemText primary={strength} />
-                  </ListItem>
-                ))}
-              </List>
-            </Paper>
+              <Paper
+                sx={{
+                  p: 3,
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  minHeight: "150px",
+                }}
+              >
+                <Typography variant="h4" gutterBottom>
+                  {rating}%
+                </Typography>
+                <LinearProgress
+                  variant="determinate"
+                  value={rating}
+                  sx={{
+                    width: "100%",
+                    height: 8,
+                    borderRadius: 5,
+                    mt: 2,
+                  }}
+                />
+              </Paper>
+            </Box>
           </Grid>
-          <Grid item xs={12} md={6}>
-            <Paper sx={{ p: 2 }}>
-              <Typography variant="h6" gutterBottom>
-                Weaknesses
-              </Typography>
-              <List>
-                {weaknesses.map((weakness, index) => (
-                  <ListItem key={index}>
-                    <ListItemText primary={weakness} />
-                  </ListItem>
-                ))}
-              </List>
-            </Paper>
+
+          {/* Strengths and Weaknesses on the same row */}
+          <Grid container item xs={12} spacing={3}>
+            <Grid item xs={12} md={6}>
+              <Paper sx={{ p: 3 }}>
+                <Typography variant="h6" gutterBottom>
+                  Strengths
+                </Typography>
+                <List>
+                  {strengths.map((strength, index) => (
+                    <ListItem key={index}>
+                      <ListItemText primary={strength} />
+                    </ListItem>
+                  ))}
+                </List>
+              </Paper>
+            </Grid>
+
+            <Grid item xs={12} md={6}>
+              <Paper sx={{ p: 3 }}>
+                <Typography variant="h6" gutterBottom>
+                  Weaknesses
+                </Typography>
+                <List>
+                  {weaknesses.map((weakness, index) => (
+                    <ListItem key={index}>
+                      <ListItemText primary={weakness} />
+                    </ListItem>
+                  ))}
+                </List>
+              </Paper>
+            </Grid>
           </Grid>
         </Grid>
       )}
 
-      {tabIndex === 2 && (
+      {tabIndex === 4 && (
         <Box sx={{ my: 4 }}>
           <Typography variant="h6" gutterBottom>
             Tradeblock
@@ -466,26 +502,6 @@ function TeamPage() {
             </List>
           </Paper>
         </Box>
-      )}
-
-      {tabIndex === 3 && (
-        <Box sx={{ my: 4 }}>
-          <Typography variant="h6" gutterBottom>
-            Lineup Compatibility
-          </Typography>
-          <Lineup lineup={lineup} onDragEnd={onDragEnd} />
-        </Box>
-      )}
-
-      {tabIndex === 4 && (
-        <>
-          <Box sx={{ my: 4 }}>
-            <Typography variant="h6" gutterBottom>
-              Prospects
-            </Typography>
-            <PlayerTable players={prospects} />
-          </Box>
-        </>
       )}
 
       {tabIndex === 5 && (
