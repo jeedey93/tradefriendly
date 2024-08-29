@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import PlayerTable from "../components/PlayerTable";
 import Lineup from "../components/Lineup";
+import TradeBlock from "../components/TradeBlock";
 import {
   Container,
   Typography,
@@ -91,6 +92,30 @@ function TeamPage() {
       })
       .catch((error) => {
         setError("Error fetching lineup data: " + error.message);
+        setLoading(false);
+      });
+  }, []);
+
+  useEffect(() => {
+    // Fetch data from the API
+    fetch(`/api/rumors`)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        // Filter players by currentTeamAbbrev
+        const filteredPlayers = data.filter(
+          (player) => player.currentTeamAbbrev === teamCode
+        );
+        setTradeblock(filteredPlayers);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error("Error fetching rumors data:", error);
+        setError("Error fetching rumors data.");
         setLoading(false);
       });
   }, []);
@@ -312,17 +337,9 @@ function TeamPage() {
       {tabIndex === 4 && (
         <Box sx={{ my: 4 }}>
           <Typography variant="h6" gutterBottom>
-            Tradeblock
+            Trade Block
           </Typography>
-          <Paper sx={{ p: 2 }}>
-            <List>
-              {tradeblock.map((item, index) => (
-                <ListItem key={index}>
-                  <ListItemText primary={item} />
-                </ListItem>
-              ))}
-            </List>
-          </Paper>
+          <TradeBlock tradeblock={tradeblock} teamImage={teamImage} />
         </Box>
       )}
 
