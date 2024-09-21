@@ -144,7 +144,8 @@ function ComparePlayers() {
           {player.fullTeamName}
         </Typography>
         <Typography variant="body2">
-          Height: {player.heightInInches} in / {player.heightInCentimeters} cm
+          Height: {convertInchesToFeetAndInches(player.heightInInches)} /{" "}
+          {player.heightInCentimeters} cm
         </Typography>
         <Typography variant="body2">
           Weight: {player.weightInPounds} lbs / {player.weightInKilograms} kg
@@ -235,6 +236,14 @@ function ComparePlayers() {
 
     return stats;
   };
+
+  // Utility function to convert inches to feet and inches
+  function convertInchesToFeetAndInches(inches) {
+    if (!inches) return "N/A";
+    const feet = Math.floor(inches / 12);
+    const remainderInches = inches % 12;
+    return `${feet}'${remainderInches}"`;
+  }
 
   return (
     <Box padding={2}>
