@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Typography,
   Box,
@@ -16,6 +16,7 @@ import {
   TableContainer,
   TableRow,
   Paper,
+  Autocomplete,
 } from "@mui/material";
 import { Search } from "@mui/icons-material";
 import { styled } from "@mui/material/styles";
@@ -48,11 +49,42 @@ const HighlightCell = styled(StatCell)(({ isWinner }) => ({
 }));
 
 function ComparePlayers() {
+  const [players, setPlayers] = useState(null);
   const [player1, setPlayer1] = useState(null);
   const [player2, setPlayer2] = useState(null);
   const [player1Id, setPlayer1Id] = useState("");
   const [player2Id, setPlayer2Id] = useState("");
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        fetch(`/api/players`)
+          .then((response) => response.json())
+          .then((data) => {
+            const mappedData = data
+              .map((player) => ({
+                id: player.id,
+                name: player.name,
+                teamAbbrev: player.teamAbbrev,
+              }))
+              .sort((a, b) => a.name.localeCompare(b.name));
+
+            setPlayers(mappedData);
+            setError(null); // Clear previous errors
+          })
+          .catch((error) => {
+            setError("Error fetching players data: " + error.message);
+          });
+      } catch (error) {
+        setError("Error fetching draft ranking data: " + error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
 
   const fetchPlayerData = (playerId, setPlayer) => {
     fetch(`/nhl/players/${playerId}`)
@@ -143,7 +175,8 @@ function ComparePlayers() {
 
   const getStats = (player) => {
     if (!player) return {};
-    return {
+
+    const stats = {
       "Games Played (Regular Season)":
         player.featuredStats.regularSeason.subSeason.gamesPlayed,
       "Goals (Regular Season)":
@@ -167,25 +200,37 @@ function ComparePlayers() {
         (
           player.featuredStats.regularSeason.subSeason.shootingPctg * 100
         ).toFixed(2) + "%",
-      "Games Played (Playoffs)":
-        player.featuredStats.playoffs.subSeason.gamesPlayed,
-      "Goals (Playoffs)": player.featuredStats.playoffs.subSeason.goals,
-      "Assists (Playoffs)": player.featuredStats.playoffs.subSeason.assists,
-      "Points (Playoffs)": player.featuredStats.playoffs.subSeason.points,
-      "+- (Playoffs)": player.featuredStats.playoffs.subSeason.plusMinus,
-      "PIM (Playoffs)": player.featuredStats.playoffs.subSeason.pim,
-      "Power Play Goals (Playoffs)":
-        player.featuredStats.playoffs.subSeason.powerPlayGoals,
-      "Power Play Points (Playoffs)":
-        player.featuredStats.playoffs.subSeason.powerPlayPoints,
-      "Game-Winning Goals (Playoffs)":
-        player.featuredStats.playoffs.subSeason.gameWinningGoals,
-      "Shots (Playoffs)": player.featuredStats.playoffs.subSeason.shots,
-      "Shooting % (Playoffs)":
+    };
+
+    // Check if playoff stats exist before adding them
+    if (
+      player.featuredStats.playoffs &&
+      player.featuredStats.playoffs.subSeason
+    ) {
+      stats["Games Played (Playoffs)"] =
+        player.featuredStats.playoffs.subSeason.gamesPlayed;
+      stats["Goals (Playoffs)"] = player.featuredStats.playoffs.subSeason.goals;
+      stats["Assists (Playoffs)"] =
+        player.featuredStats.playoffs.subSeason.assists;
+      stats["Points (Playoffs)"] =
+        player.featuredStats.playoffs.subSeason.points;
+      stats["+- (Playoffs)"] =
+        player.featuredStats.playoffs.subSeason.plusMinus;
+      stats["PIM (Playoffs)"] = player.featuredStats.playoffs.subSeason.pim;
+      stats["Power Play Goals (Playoffs)"] =
+        player.featuredStats.playoffs.subSeason.powerPlayGoals;
+      stats["Power Play Points (Playoffs)"] =
+        player.featuredStats.playoffs.subSeason.powerPlayPoints;
+      stats["Game-Winning Goals (Playoffs)"] =
+        player.featuredStats.playoffs.subSeason.gameWinningGoals;
+      stats["Shots (Playoffs)"] = player.featuredStats.playoffs.subSeason.shots;
+      stats["Shooting % (Playoffs)"] =
         (player.featuredStats.playoffs.subSeason.shootingPctg * 100).toFixed(
           2
-        ) + "%",
-    };
+        ) + "%";
+    }
+
+    return stats;
   };
 
   return (
@@ -197,13 +242,21 @@ function ComparePlayers() {
       {/* Search fields for players */}
       <Grid container spacing={2} justifyContent="center">
         <Grid item xs={12} sm={5}>
-          <TextField
-            label="Player 1 ID"
-            variant="outlined"
-            fullWidth
-            value={player1Id}
-            onChange={(e) => setPlayer1Id(e.target.value)}
-            size="small"
+          <Autocomplete
+            options={players}
+            getOptionLabel={(option) => `${option.name} - ${option.teamAbbrev}`}
+            onChange={(event, newValue) => {
+              setPlayer1Id(newValue ? newValue.id : "");
+            }}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Player 1 ID"
+                variant="outlined"
+                fullWidth
+                size="small"
+              />
+            )}
           />
           <Button
             variant="contained"
@@ -217,13 +270,21 @@ function ComparePlayers() {
           </Button>
         </Grid>
         <Grid item xs={12} sm={5}>
-          <TextField
-            label="Player 2 ID"
-            variant="outlined"
-            fullWidth
-            value={player2Id}
-            onChange={(e) => setPlayer2Id(e.target.value)}
-            size="small"
+          <Autocomplete
+            options={players}
+            getOptionLabel={(option) => `${option.name} - ${option.teamAbbrev}`}
+            onChange={(event, newValue) => {
+              setPlayer2Id(newValue ? newValue.id : "");
+            }}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Player 2 ID"
+                variant="outlined"
+                fullWidth
+                size="small"
+              />
+            )}
           />
           <Button
             variant="contained"
